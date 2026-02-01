@@ -1,0 +1,15 @@
+{
+  "name": "wedding-invitation",
+  "version": "1.0.0",
+  "description": "Wedding invitation website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "express": "^4.18.2",
+    "multer": "^2.0.2",
+    "sharp": "^0.34.5"
+  }
+}

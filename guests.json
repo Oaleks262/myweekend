@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "name": "Олександр Іваненко",
+    "slug": "oleksandr-ivanenko"
+  },
+  {
+    "id": 2,
+    "name": "Соломія Петренко та Богдан Петренко",
+    "slug": "solomiya-bogdan-petrenko"
+  },
+  {
+    "id": 3,
+    "name": "Марко Шевченко",
+    "slug": "marko-shevchenko"
+  },
+  {
+    "id": 4,
+    "name": "Анна Коваленко",
+    "slug": "anna-kovalenko"
+  },
+  {
+    "id": 5,
+    "name": "Іван Сидоренко",
+    "slug": "ivan-sydorenko"
+  },
+  {
+    "id": 6,
+    "name": "Оксана Мельниченко",
+    "slug": "oksana-melnychenko"
+  },
+  {
+    "id": 7,
+    "name": "Петро Бойко",
+    "slug": "petro-boyko"
+  },
+  {
+    "id": 8,
+    "name": "Ольга Ворона",
+    "slug": "olha-vorona"
+  },
+  {
+    "id": 9,
+    "name": "Дмитро Кравченко",
+    "slug": "dmytro-kravchenko"
+  },
+  {
+    "id": 10,
+    "name": "Юлія Горошчук",
+    "slug": "yuliia-goroshchuk"
+  },
+  {
+    "id": 11,
+    "name": "Олександр Звірич",
+    "slug": "oleksandr-zvirych",
+    "confirmed": true,
+    "confirmedAt": "2026-02-01T18:44:28.831Z",
+    "phone": "+380675252300"
+  },
+  {
+    "id": 12,
+    "name": "Соломія та Олександр Звірич",
+    "slug": "solomiia-ta-oleksandr-zvirych",
+    "phone": "+380964455289",
+    "confirmed": true,
+    "confirmedAt": "2026-02-01T18:49:58.943Z"
+  }
+]

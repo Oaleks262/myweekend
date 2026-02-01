@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Запрошення — Олександр & Соломія</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  /* loading spinner overlay — shown until guest data loads */
+  .loader {
+    position: fixed; inset: 0;
+    background: var(--forest);
+    z-index: 10000;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+  }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+
+  .loader__ring {
+    width: 36px; height: 36px;
+    border: 2px solid rgba(244,241,236,0.15);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loader__text {
+    font-size: 11px; letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(244,241,236,0.4);
+    font-weight: 300;
+  }
+
+  /* 404 fallback — shown if guest not found */
+  .notfound {
+    display: none;
+    position: fixed; inset: 0;
+    background: var(--forest);
+    z-index: 10000;
+    flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 20px; text-align: center; padding: 40px;
+  }
+  .notfound.show { display: flex; }
+  .notfound h2 {
+    font-family: 'Great Vibes', cursive;
+    font-size: 42px; color: var(--cream);
+  }
+  .notfound p {
+    font-size: 14px; color: rgba(244,241,236,0.5);
+    font-weight: 300; max-width: 340px; line-height: 1.7;
+  }
+  .notfound a {
+    display: inline-block; margin-top: 12px;
+    padding: 11px 28px; background: var(--gold);
+    border-radius: 36px; color: var(--forest);
+    font-size: 11px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; text-decoration: none;
+    transition: background 0.3s;
+  }
+  .notfound a:hover { background: #d4bb7e; }
+</style>
+</head>
+<body>
+
+<!-- ═══ SPLASH SCREEN ═══ -->
+<div class="splash" id="splash">
+  <div class="splash__content">
+    <div class="splash__label">Запрошення на весілля</div>
+    <div class="splash__names">Олександр & Соломія</div>
+    <button class="splash__btn" id="splashBtn">Відкрити запрошення</button>
+  </div>
+</div>
+
+<!-- Loading screen -->
+<div class="loader" id="loader">
+  <div class="loader__ring"></div>
+  <div class="loader__text">Завантаження…</div>
+</div>
+
+<!-- 404 screen -->
+<div class="notfound" id="notfound">
+  <h2>Упс…</h2>
+  <p>Посилання невалідне або вже не актуальне. Перейдіть на головну сторінку.</p>
+  <a href="/">На головну</a>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero__photo"></div>
+  <div class="hero__vignette"></div>
+  <div class="hero__fade"></div>
+
+  <div class="hero__content">
+    <div class="hero__label">Ми одружуємося</div>
+    <div class="hero__names">
+      Олександр
+      <span class="hero__amp">&amp;</span>
+      Соломія
+    </div>
+    <div class="hero__line"></div>
+    <div class="hero__date">23 · 08 · 2026</div>
+  </div>
+
+  <!-- Player -->
+  <div class="player" id="player">
+    <span class="player__title"></span>
+    <div class="player__track" id="trackWrap"><div class="player__track-fill" id="trackFill"></div></div>
+    <div class="player__row">
+      <span class="player__time" id="pTime">0:00 / 3:45</span>
+      <button class="player__btn" id="playBtn">
+        <svg id="iconPlay" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+        <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- <div class="hero__scroll"><div class="hero__scroll-line"></div></div> -->
+</section>
+
+<div class="divider" style="background:var(--cream)"><div class="divider__line"></div><div class="divider__dot"></div></div>
+
+<!-- ═══ § 1 — ЗАПРОШЕННЯ (personalized) ═══ -->
+<section class="section inv">
+  <div class="section__inner">
+    <div class="section__tag reveal">— Запрошення —</div>
+    <h2 class="section__title reveal d1" id="invTitle"></h2>
+
+    <div class="inv__layout">
+      <div class="inv__text reveal d2">
+        <p>
+          Ми з радістю та теплом у серці запрошуємо 
+          Вас приєднатися на  святкування нашого весілля яке відбудеться вже цього літа. 
+          Ми будемо безмежно щасливі, якщо ви розділите з нами радіть цього дня.
+        </p>
+        <!-- <p>
+          Цей день буде повний любові, сміху та моментів,
+          які залишаться в пам'яті назавжди. Нехай кожна хвилина
+          торжества буде пронята теплом тих, хто нам
+          дійсно дорогі — тобто Вас.
+        </p>
+        <div class="inv__sign">З любов'ю</div> -->
+      </div>
+
+      <div class="cal reveal d3">
+        <div class="cal__head">
+          <span class="cal__month">Серпень</span>
+          <span class="cal__year">2026</span>
+        </div>
+        <div class="cal__wk"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Нд</span></div>
+        <div class="cal__grid" id="calGrid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="background:var(--cream)"><div class="divider__line"></div><div class="divider__dot"></div></div>
+
+<!-- ═══ § 2 — ТАЙМІНГ ═══ -->
+<section class="section tl-sec">
+  <div class="section__inner">
+    <div class="section__tag reveal">— План дня —</div>
+    <h2 class="section__title reveal d1">Формат події</h2>
+    <div class="tl">
+      <div class="tl-item tl-item--l reveal">
+        <div class="tl-card">
+          <div class="tl-time">14:00</div>
+          <div class="tl-event">Зустріч у домі нареченої</div>
+          <div class="tl-addr"><a href="https://www.google.com/maps/place/Kyiv,+Ukraine/" target="_blank" rel="noopener">вул. Лютеранська, 10, Київ</a></div>
+        </div>
+        <div class="tl-dot"></div>
+      </div>
+      <div class="tl-item tl-item--r reveal d1">
+        <div class="tl-dot"></div>
+        <div class="tl-card">
+          <div class="tl-time">16:00</div>
+          <div class="tl-event">Церемонія шлюбу</div>
+          <div class="tl-addr"><a href="https://www.google.com/maps/place/Kyiv,+Ukraine/" target="_blank" rel="noopener">Собор Святого Андрія, вул. Андреєвська, 3</a></div>
+        </div>
+      </div>
+      <div class="tl-item tl-item--l reveal d2">
+        <div class="tl-card">
+          <div class="tl-time">18:30</div>
+          <div class="tl-event">Заклад</div>
+          <div class="tl-addr"><a href="https://www.google.com/maps/place/Kyiv,+Ukraine/" target="_blank" rel="noopener">Ресторан «Золоті Ворота», вул. Золотої Брами, 7</a></div>
+        </div>
+        <div class="tl-dot"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="background:var(--cream)"><div class="divider__line"></div><div class="divider__dot"></div></div>
+
+<!-- ═══ § 3 — ДРЕСКОД ═══ -->
+<section class="section dc">
+  <div class="section__inner">
+    <div class="section__tag reveal">— Dress Code —</div>
+    <h2 class="section__title reveal d1">Дрескод</h2>
+    <div class="dc__text reveal d2">
+      <p>
+        Наше  весілля — це свято любові та елегантності.
+        Нам буде дуже приємно якщо ви оберете наряд у кольорах нашого весілля.
+        Просимо орієнтуватися на цю палітру кольорів.
+      </p>
+    </div>
+    <div class="dc__palette reveal d3">
+          <div class="dc__sw"><div class="dc__circle" style="background:#E5E6E3"></div></div>
+          <div class="dc__sw"><div class="dc__circle" style="background:#DDDED4"></div></div>
+          <div class="dc__sw"><div class="dc__circle" style="background:#B1B6AD"></div></div>
+          <div class="dc__sw"><div class="dc__circle" style="background:#949692"></div></div>
+          <div class="dc__sw"><div class="dc__circle" style="background:#acb091"></div></div>
+          <div class="dc__sw"><div class="dc__circle" style="background:#868c61"></div></div>
+          <div class="dc__sw"><div class="dc__circle" style="background:#666e36"></div></div>
+          <!-- <div class="dc__sw"><div class="dc__circle" style="background:#566A41"></div></div>
+          <div class="dc__sw"><div class="dc__circle" style="background:#546445"></div></div> -->
+          <div class="dc__sw"><div class="dc__circle" style="background:#495023"></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="background:var(--cream)"><div class="divider__line"></div><div class="divider__dot"></div></div>
+
+<!-- ═══ § 4 — ТАЙМЕР + RSVP ═══ -->
+<section class="section cd-sec">
+  <div class="section__inner">
+    <div class="section__tag reveal">— Зворотний відлік —</div>
+    <h2 class="section__title reveal d1">Чекаємо на Вас через…</h2>
+    <div class="timer reveal d2">
+      <div class="t-unit"><div class="t-val" id="tD">000</div><div class="t-label">Днів</div></div>
+      <div class="t-colon">:</div>
+      <div class="t-unit"><div class="t-val" id="tH">00</div><div class="t-label">Годин</div></div>
+      <div class="t-colon">:</div>
+      <div class="t-unit"><div class="t-val" id="tM">00</div><div class="t-label">Хвилин</div></div>
+      <div class="t-colon">:</div>
+      <div class="t-unit"><div class="t-val" id="tS">00</div><div class="t-label">Секунд</div></div>
+    </div>
+    <p class="cd-para reveal d3">
+      Будь ласка підтвердіть свою присутність на весіллі до 26 червня 2026
+    </p>
+    <div class="rsvp reveal d4">
+      <div id="rsvpForm">
+        <div class="rsvp__guest-name" id="rsvpGuestName"></div>
+        <button class="rsvp__btn" id="rBtn">Підтвердити присутність</button>
+      </div>
+      <div class="rsvp__ok" id="rOk">
+        <span class="rsvp__ok-heart">♥</span>
+        <p>Дякуємо! Ми дуже очікуємо Вас на нашому святі 23 серпня.</p>
+      </div>
+      <div class="rsvp__already" id="rAlready">
+        <span class="rsvp__ok-heart">✓</span>
+        <p>Ви вже підтвердили свою присутність. Дякуємо!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ § 5 — ПОДЯКА ═══ -->
+<section class="section thx">
+  <div class="section__inner">
+    <!-- <div class="section__tag reveal">— Деталі —</div> -->
+    <h2 class="section__title reveal d1">Деталі</h2>
+    <div class="thx__photo reveal d2">
+      <img src="./img/IMG_FA56B1C5F58F-1.jpeg" alt="Олександр & Соломія"/>
+    </div>
+    <div class="thx__text reveal d3">
+      <p>
+        Будемо дуже вдячні за будь-який прояв вашої уваги.
+Та якщо ви роздумуєте над подарунком, найкращою підтримкою для нас стане фінансовий внесок у нашу спільну мрію.
+      </p>
+      <p>
+Ваш подарунок допоможе нам швидше здійснити цю ціль та зробити наше сімейне життя ще комфортнішим.
+Дякуємо за розуміння і вашу підтримку.
+      </p>
+      <div class="thx__sign">Чекаємо на Вас</div>
+      <div class="thx__sign">Олександр &amp; Соломія</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ § 6 — НАШІ ФОТО ═══ -->
+<section class="section photos-sec" id="photosSection" style="display:none;">
+  <div class="section__inner">
+    <div class="section__tag reveal">— Галерея —</div>
+    <h2 class="section__title reveal d1">Наші фото</h2>
+    <div class="photos-gallery reveal d2" id="photosGallery"></div>
+    <a href="/api/photos/download" class="photos-download reveal d3" id="photosDownload">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Завантажити фотографії
+    </a>
+  </div>
+</section>
+
+<script src="app.js"></script>
+<script>
+// ─── GUEST PAGE INIT ───
+// Reads slug from URL, fetches guest data, personalizes the page.
+// Must run AFTER app.js so shared logic (calendar, timer, player) is ready.
+(async function initGuestPage() {
+  const slug = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
+
+  try {
+    const res   = await fetch(`/api/guest/${slug}`);
+    if (!res.ok) throw new Error('not found');
+    const guest = await res.json();
+
+    // 1. Personalize section title
+    document.getElementById('invTitle').textContent = guest.name;
+
+    // 2. Show guest name in RSVP
+    document.getElementById('rsvpGuestName').textContent = guest.name;
+
+    // 3. Update page title
+    document.title = `${guest.name} — Олександр & Соломія`;
+
+    // 4. Check if already confirmed
+    if (guest.confirmed) {
+      document.getElementById('rsvpForm').style.display = 'none';
+      document.getElementById('rAlready').style.display = 'block';
+    }
+
+    // 5. RSVP button handler
+    document.getElementById('rBtn').addEventListener('click', async () => {
+      try {
+        const rsvpRes = await fetch(`/api/rsvp/${slug}`, { method: 'POST' });
+        if (rsvpRes.ok) {
+          document.getElementById('rsvpForm').style.display = 'none';
+          document.getElementById('rOk').style.display = 'block';
+        }
+      } catch (err) {
+        console.error('RSVP error:', err);
+      }
+    });
+
+    // 6. Hide loader
+    document.getElementById('loader').classList.add('hidden');
+
+    // 7. Load photos section if enabled
+    loadPhotosSection();
+
+  } catch (e) {
+    // guest not found → show 404 screen
+    document.getElementById('loader').classList.add('hidden');
+    document.getElementById('notfound').classList.add('show');
+  }
+})();
+
+// ─── PHOTOS SECTION ───
+async function loadPhotosSection() {
+  try {
+    // Check if photos are enabled
+    const settingsRes = await fetch('/api/settings');
+    const settings = await settingsRes.json();
+
+    if (!settings.photosEnabled) return;
+
+    // Load photos
+    const photosRes = await fetch('/api/photos');
+    const photos = await photosRes.json();
+
+    if (photos.length === 0) return;
+
+    // Show section
+    document.getElementById('photosSection').style.display = 'block';
+
+    // Render gallery
+    const gallery = document.getElementById('photosGallery');
+    gallery.innerHTML = photos.map(p => `
+      <div class="photos-item">
+        <img src="${p.url}" alt="Фото" loading="lazy"/>
+      </div>
+    `).join('');
+
+  } catch (e) {
+    console.error('Photos load error:', e);
+  }
+}
+</script>
+</body>
+</html>

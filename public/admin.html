@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Адмін — Гості</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #1a1a1a;
+    --card: #252525;
+    --border: #333;
+    --text: #e5e5e5;
+    --text-dim: #888;
+    --gold: #c4a96a;
+    --green: #4ade80;
+    --red: #f87171;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 40px 20px;
+    min-height: 100vh;
+  }
+
+  /* ═══ LOGIN ═══ */
+  .login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .login-overlay.hidden { display: none; }
+
+  .login-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+  }
+
+  .login-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .login-subtitle {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+  }
+
+  .login-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .login-input:focus { border-color: var(--gold); }
+  .login-input::placeholder { color: var(--text-dim); }
+
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--gold);
+    border: none;
+    border-radius: 8px;
+    color: #1a1a1a;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: opacity 0.2s;
+  }
+
+  .login-btn:hover { opacity: 0.9; }
+
+  .login-error {
+    color: var(--red);
+    font-size: 13px;
+    margin-top: 16px;
+    display: none;
+  }
+
+  .login-error.show { display: block; }
+
+  /* ═══ MAIN ═══ */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--gold);
+  }
+
+  .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .logout-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    color: var(--text-dim);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* ═══ SECTIONS NAV ═══ */
+  .sections-nav {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+
+  .section-btn {
+    padding: 12px 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-dim);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .section-btn:hover { border-color: var(--gold); color: var(--text); }
+  .section-btn.active { background: var(--gold); color: #1a1a1a; border-color: var(--gold); font-weight: 600; }
+
+  .section-panel { display: none; }
+  .section-panel.active { display: block; }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .tab {
+    padding: 10px 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { border-color: var(--gold); color: var(--text); }
+  .tab.active { background: var(--gold); color: #1a1a1a; border-color: var(--gold); font-weight: 600; }
+
+  .tab-count {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    margin-left: 6px;
+  }
+
+  .tab.active .tab-count { background: rgba(0,0,0,0.2); }
+
+  /* Add form */
+  .add-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .add-form input {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .add-form input:focus { border-color: var(--gold); }
+  .add-form input::placeholder { color: var(--text-dim); }
+
+  .add-form button, .btn {
+    padding: 12px 24px;
+    background: var(--gold);
+    border: none;
+    border-radius: 8px;
+    color: #1a1a1a;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .add-form button:hover, .btn:hover { opacity: 0.9; }
+
+  /* Table */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:hover { background: rgba(255,255,255,0.02); }
+
+  .guest-name { font-weight: 500; }
+
+  .guest-link {
+    color: var(--gold);
+    text-decoration: none;
+    font-size: 12px;
+    word-break: break-all;
+  }
+
+  .guest-link:hover { text-decoration: underline; }
+
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  .status--yes { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+  .status--no { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .phone-input {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--text);
+    font-size: 13px;
+    width: 140px;
+    outline: none;
+  }
+
+  .phone-input:focus { border-color: var(--gold); }
+  .phone-input::placeholder { color: var(--text-dim); }
+
+  .copy-btn, .del-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green); }
+  .del-btn:hover { border-color: var(--red); color: var(--red); }
+
+  .actions { display: flex; gap: 6px; }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+
+  .empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
+
+  .main-content { display: none; }
+  .main-content.show { display: block; }
+
+  /* ═══ PHOTOS ═══ */
+  .photos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .toggle {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    background: var(--border);
+    border-radius: 13px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+
+  .toggle.active { background: var(--green); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+  }
+
+  .toggle.active::after { transform: translateX(24px); }
+
+  .toggle-label {
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    margin-bottom: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .upload-area:hover { border-color: var(--gold); }
+  .upload-area.dragover { border-color: var(--gold); background: rgba(196,169,106,0.05); }
+
+  .upload-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .upload-text {
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  .upload-text span {
+    color: var(--gold);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+  }
+
+  .photo-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--card);
+  }
+
+  .photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-delete {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    background: rgba(0,0,0,0.7);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .photo-item:hover .photo-delete { opacity: 1; }
+  .photo-delete:hover { background: var(--red); }
+
+  .upload-progress {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    display: none;
+  }
+
+  .upload-progress.show { display: block; }
+
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--gold);
+    width: 0%;
+    transition: width 0.3s;
+  }
+
+  .progress-text {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .table-wrap { overflow-x: auto; }
+    table { min-width: 700px; }
+    .sections-nav { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN SCREEN ═══ -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="login-title">Адмін панель</div>
+    <div class="login-subtitle">Увійдіть для управління гостями</div>
+    <input type="text" class="login-input" id="loginUser" placeholder="Логін" autocomplete="off"/>
+    <input type="password" class="login-input" id="loginPass" placeholder="Пароль"/>
+    <button class="login-btn" id="loginBtn">Увійти</button>
+    <div class="login-error" id="loginError">Невірний логін або пароль</div>
+  </div>
+</div>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<div class="container main-content" id="mainContent">
+  <div class="header">
+    <div>
+      <h1>Адмін панель</h1>
+      <p class="subtitle">Олександр & Соломія — 23.08.2026</p>
+    </div>
+    <button class="logout-btn" id="logoutBtn">Вийти</button>
+  </div>
+
+  <!-- Section Navigation -->
+  <div class="sections-nav">
+    <button class="section-btn active" data-section="guests">Гості</button>
+    <button class="section-btn" data-section="photos">Фотографії</button>
+  </div>
+
+  <!-- ═══ GUESTS SECTION ═══ -->
+  <div class="section-panel active" id="guestsSection">
+    <div class="tabs">
+      <button class="tab active" data-tab="all">Всі гості <span class="tab-count" id="countAll">0</span></button>
+      <button class="tab" data-tab="confirmed">Підтвердили <span class="tab-count" id="countConfirmed">0</span></button>
+      <button class="tab" data-tab="pending">Очікують <span class="tab-count" id="countPending">0</span></button>
+    </div>
+
+    <div class="add-form">
+      <input type="text" id="newName" placeholder="Ім'я гостя (напр. Іван Петренко)"/>
+      <input type="text" id="newPhone" placeholder="Телефон (необов'язково)"/>
+      <button id="addBtn">Додати гостя</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ім'я</th>
+            <th>Телефон</th>
+            <th>Посилання</th>
+            <th>Статус</th>
+            <th>Дії</th>
+          </tr>
+        </thead>
+        <tbody id="guestList"></tbody>
+      </table>
+      <div class="empty" id="emptyState" style="display:none;">
+        <div class="empty-icon">📋</div>
+        <p>Немає гостей для відображення</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PHOTOS SECTION ═══ -->
+  <div class="section-panel" id="photosSection">
+    <div class="photos-header">
+      <div class="toggle-wrap">
+        <div class="toggle" id="photosToggle"></div>
+        <span class="toggle-label">Показувати секцію "Наші фото" гостям</span>
+      </div>
+      <div style="display:flex;gap:12px;">
+        <span id="photoCount" style="color:var(--text-dim);font-size:14px;align-self:center;">0 фото</span>
+      </div>
+    </div>
+
+    <div class="upload-area" id="uploadArea">
+      <div class="upload-icon">📷</div>
+      <div class="upload-text">Перетягніть фото сюди або <span>оберіть файли</span></div>
+      <input type="file" id="fileInput" multiple accept="image/*" style="display:none;"/>
+    </div>
+
+    <div class="upload-progress" id="uploadProgress">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-text" id="progressText">Завантаження...</div>
+    </div>
+
+    <div class="photos-grid" id="photosGrid"></div>
+  </div>
+</div>
+
+<script>
+// ═══ AUTH ═══
+const CREDENTIALS = { user: 'ZvirDem', pass: '23082026' };
+const SESSION_KEY = 'admin_session';
+
+function isLoggedIn() {
+  return sessionStorage.getItem(SESSION_KEY) === 'true';
+}
+
+function login(user, pass) {
+  if (user === CREDENTIALS.user && pass === CREDENTIALS.pass) {
+    sessionStorage.setItem(SESSION_KEY, 'true');
+    return true;
+  }
+  return false;
+}
+
+function logout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  location.reload();
+}
+
+function showMain() {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  document.getElementById('mainContent').classList.add('show');
+}
+
+document.getElementById('loginBtn').addEventListener('click', () => {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+
+  if (login(user, pass)) {
+    showMain();
+    loadGuests();
+    loadPhotos();
+    loadSettings();
+  } else {
+    document.getElementById('loginError').classList.add('show');
+  }
+});
+
+document.getElementById('loginPass').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') document.getElementById('loginBtn').click();
+});
+
+document.getElementById('loginUser').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') document.getElementById('loginPass').focus();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', logout);
+
+if (isLoggedIn()) {
+  showMain();
+}
+
+// ═══ SECTION NAVIGATION ═══
+document.querySelectorAll('.section-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.section-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.section + 'Section').classList.add('active');
+  });
+});
+
+// ═══ GUESTS ═══
+const API = '/api';
+let guests = [];
+let currentTab = 'all';
+
+async function loadGuests() {
+  const res = await fetch(`${API}/guests`);
+  guests = await res.json();
+  updateCounts();
+  renderTable();
+}
+
+function updateCounts() {
+  const confirmed = guests.filter(g => g.confirmed).length;
+  document.getElementById('countAll').textContent = guests.length;
+  document.getElementById('countConfirmed').textContent = confirmed;
+  document.getElementById('countPending').textContent = guests.length - confirmed;
+}
+
+function getFilteredGuests() {
+  if (currentTab === 'confirmed') return guests.filter(g => g.confirmed);
+  if (currentTab === 'pending') return guests.filter(g => !g.confirmed);
+  return guests;
+}
+
+function renderTable() {
+  const filtered = getFilteredGuests();
+  const tbody = document.getElementById('guestList');
+  const empty = document.getElementById('emptyState');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  const baseUrl = window.location.origin;
+
+  tbody.innerHTML = filtered.map(g => `
+    <tr data-id="${g.id}">
+      <td class="guest-name">${g.name}</td>
+      <td>
+        <input type="text" class="phone-input" value="${g.phone || ''}" placeholder="+380..."
+          onchange="updatePhone('${g.slug}', this.value)"/>
+      </td>
+      <td>
+        <a href="/${g.slug}" target="_blank" class="guest-link">${baseUrl}/${g.slug}</a>
+      </td>
+      <td>
+        ${g.confirmed
+          ? '<span class="status status--yes"><span class="status-dot"></span>Підтвердив</span>'
+          : '<span class="status status--no"><span class="status-dot"></span>Очікує</span>'
+        }
+      </td>
+      <td class="actions">
+        <button class="copy-btn" onclick="copyLink('${g.slug}', this)">Копіювати</button>
+        <button class="del-btn" onclick="deleteGuest('${g.slug}')">Видалити</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('addBtn').addEventListener('click', async () => {
+  const nameInput = document.getElementById('newName');
+  const phoneInput = document.getElementById('newPhone');
+  const name = nameInput.value.trim();
+  const phone = phoneInput.value.trim();
+
+  if (!name) return alert('Введіть ім\'я гостя');
+
+  const res = await fetch(`${API}/guests`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, phone })
+  });
+
+  if (res.ok) {
+    nameInput.value = '';
+    phoneInput.value = '';
+    loadGuests();
+  } else {
+    const err = await res.json();
+    alert(err.error || 'Помилка');
+  }
+});
+
+async function updatePhone(slug, phone) {
+  await fetch(`${API}/guest/${slug}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone })
+  });
+}
+
+function copyLink(slug, btn) {
+  const url = `${window.location.origin}/${slug}`;
+  navigator.clipboard.writeText(url);
+  btn.textContent = 'Скопійовано!';
+  btn.classList.add('copied');
+  setTimeout(() => {
+    btn.textContent = 'Копіювати';
+    btn.classList.remove('copied');
+  }, 2000);
+}
+
+async function deleteGuest(slug) {
+  if (!confirm('Видалити гостя?')) return;
+  await fetch(`${API}/guest/${slug}`, { method: 'DELETE' });
+  loadGuests();
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentTab = tab.dataset.tab;
+    renderTable();
+  });
+});
+
+document.getElementById('newName').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') document.getElementById('addBtn').click();
+});
+
+// ═══ PHOTOS ═══
+let photos = [];
+
+async function loadSettings() {
+  const res = await fetch(`${API}/settings`);
+  const settings = await res.json();
+  const toggle = document.getElementById('photosToggle');
+  if (settings.photosEnabled) {
+    toggle.classList.add('active');
+  } else {
+    toggle.classList.remove('active');
+  }
+}
+
+async function loadPhotos() {
+  const res = await fetch(`${API}/photos`);
+  photos = await res.json();
+  renderPhotos();
+}
+
+function renderPhotos() {
+  const grid = document.getElementById('photosGrid');
+  document.getElementById('photoCount').textContent = `${photos.length} фото`;
+
+  if (photos.length === 0) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">📷</div><p>Немає завантажених фото</p></div>';
+    return;
+  }
+
+  grid.innerHTML = photos.map(p => `
+    <div class="photo-item">
+      <img src="${p.url}" alt=""/>
+      <button class="photo-delete" onclick="deletePhoto('${p.name}')">&times;</button>
+    </div>
+  `).join('');
+}
+
+// Toggle photos visibility
+document.getElementById('photosToggle').addEventListener('click', async function() {
+  this.classList.toggle('active');
+  const enabled = this.classList.contains('active');
+
+  await fetch(`${API}/settings`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ photosEnabled: enabled })
+  });
+});
+
+// Upload area
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+
+uploadArea.addEventListener('click', () => fileInput.click());
+
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.classList.add('dragover');
+});
+
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.classList.remove('dragover');
+});
+
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+
+fileInput.addEventListener('change', () => {
+  handleFiles(fileInput.files);
+  fileInput.value = '';
+});
+
+async function handleFiles(files) {
+  if (files.length === 0) return;
+
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append('photos', file);
+  }
+
+  const progress = document.getElementById('uploadProgress');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+
+  progress.classList.add('show');
+  progressFill.style.width = '0%';
+  progressText.textContent = `Завантаження 0/${files.length}...`;
+
+  try {
+    const res = await fetch(`${API}/photos`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (res.ok) {
+      progressFill.style.width = '100%';
+      progressText.textContent = `Завантажено ${files.length} фото`;
+      setTimeout(() => {
+        progress.classList.remove('show');
+        loadPhotos();
+      }, 1000);
+    } else {
+      throw new Error('Upload failed');
+    }
+  } catch (e) {
+    progressText.textContent = 'Помилка завантаження';
+    setTimeout(() => progress.classList.remove('show'), 2000);
+  }
+}
+
+async function deletePhoto(name) {
+  if (!confirm('Видалити фото?')) return;
+  await fetch(`${API}/photos/${name}`, { method: 'DELETE' });
+  loadPhotos();
+}
+
+// Init
+if (isLoggedIn()) {
+  loadGuests();
+  loadPhotos();
+  loadSettings();
+}
+</script>
+
+</body>
+</html>
