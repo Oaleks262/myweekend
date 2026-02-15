@@ -160,3 +160,21 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     rOk.style.display  = 'block';
   });
 })();
+
+// ════════════════════════════════════════════
+//  6. SCROLL ARROW
+// ════════════════════════════════════════════
+(function initScrollArrow() {
+  const arrow = document.getElementById('scrollArrow');
+  if (!arrow) return;
+
+  arrow.addEventListener('click', () => {
+    const hero = document.querySelector('.hero');
+    if (hero) {
+      window.scrollTo({
+        top: hero.offsetHeight,
+        behavior: 'smooth'
+      });
+    }
+  });
+})();

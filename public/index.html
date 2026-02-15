@@ -34,20 +34,26 @@
     <div class="hero__date">23 · 08 · 2026</div>
   </div>
 
-  <!-- Player -->
-  <div class="player" id="player">
-    <span class="player__title"></span>
-    <div class="player__track" id="trackWrap"><div class="player__track-fill" id="trackFill"></div></div>
-    <div class="player__row">
-      <span class="player__time" id="pTime">0:00 / 3:45</span>
-      <button class="player__btn" id="playBtn">
-        <svg id="iconPlay" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
-        <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-      </button>
+  <!-- Bottom section: Player + Scroll Arrow -->
+  <div class="hero__bottom">
+    <div class="player" id="player">
+      <span class="player__title"></span>
+      <div class="player__track" id="trackWrap"><div class="player__track-fill" id="trackFill"></div></div>
+      <div class="player__row">
+        <span class="player__time" id="pTime">0:00 / 3:45</span>
+        <button class="player__btn" id="playBtn">
+          <svg id="iconPlay" viewBox="0 0 24 24"><polygon points="6,3 20,12 6,21"/></svg>
+          <svg id="iconPause" viewBox="0 0 24 24" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="scroll-arrow" id="scrollArrow">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
     </div>
   </div>
-
-  <!-- <div class="hero__scroll"><div class="hero__scroll-line"></div></div> -->
 </section>
 
 <div class="divider" style="background:var(--cream)"><div class="divider__line"></div><div class="divider__dot"></div></div>
@@ -62,8 +68,8 @@
       <div class="inv__text reveal d2">
         <p>
           Ми з радістю та теплом у серці запрошуємо
-          Вас приєднатися на  святкування нашого весілля яке відбудеться вже цього літа.
-          Ми будемо безмежно щасливі, якщо ви розділите з нами радіть цього дня.
+          Вас приєднатися до святкування нашого весілля, яке відбудеться вже цього літа.
+          Ми будемо безмежно щасливі, якщо ви розділите з нами радість цього дня.
         </p>
         <!-- <p>
           Цей день буде повний любові, сміху та моментів,
@@ -128,11 +134,11 @@
 <section class="section dc">
   <div class="section__inner">
     <div class="section__tag reveal">— Dress Code —</div>
-    <h2 class="section__title reveal d1">Дрескод</h2>
+    <h2 class="section__title reveal d1">Палітра свята</h2>
     <div class="dc__text reveal d2">
       <p>
-        Наше  весілля — це свято любові та елегантності.
-        Нам буде дуже приємно якщо ви оберете наряд у кольорах нашого весілля.
+        Наше весілля — це свято любові та елегантності.
+        Нам буде дуже приємно, якщо ви оберете наряд у кольорах нашого весілля.
         Просимо орієнтуватися на цю палітру кольорів.
       </p>
     </div>
@@ -168,7 +174,7 @@
       <div class="t-unit"><div class="t-val" id="tS">00</div><div class="t-label">Секунд</div></div>
     </div>
     <p class="cd-para reveal d3">
-      Будь ласка підтвердіть свою присутність на весіллі до 26 червня 2026
+      Будь ласка, підтвердіть свою присутність на весіллі до 26 червня 2026 року.
     </p>
     <div class="rsvp reveal d4">
       <div id="rsvpForm">
@@ -178,7 +184,7 @@
         </div>
         <div class="rsvp__f">
           <label class="rsvp__l">Додаткові гості</label>
-          <input class="rsvp__i" type="text" placeholder="Наприклад: Ціна Петренко"/>
+          <input class="rsvp__i" type="text" placeholder="Наприклад: Ірина Петренко"/>
         </div>
         <div class="rsvp__f">
           <label class="rsvp__l">Транспорт</label>
