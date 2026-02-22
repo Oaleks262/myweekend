@@ -6,7 +6,7 @@ const sharp   = require('sharp');
 const archiver = require('archiver');
 
 const app  = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 2308;
 const GUESTS_PATH = path.join(__dirname, 'guests.json');
 const SETTINGS_PATH = path.join(__dirname, 'settings.json');
 const PHOTOS_DIR = path.join(__dirname, 'public', 'photos');
