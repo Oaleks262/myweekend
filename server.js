@@ -26,7 +26,7 @@ const DEFAULT_SITE_SETTINGS = {
     text2: 'Ваш подарунок допоможе нам швидше здійснити цю ціль та зробити наше сімейне життя ще комфортнішим. Дякуємо за розуміння і вашу підтримку.'
   },
   colors: { forest: '#333819', gold: '#c4a96a', cream: '#f4f1ec' },
-  dresscode: { colors: ['#868581', '#d4d4cf', '#b1b4af', '#8c8f89', '#acb091', '#8a9161', '#6c772d', '#5d662b'] },
+  dresscode: { colors: ['#8685810d', '#d4d4cfe8', '#b1b4afe3', '#8c8f89de', '#acb091', '#8a9161', '#6c772d', '#5d662b'] },
   splashColors: { background: '#E5E6E3', names: '#495023', button: '#868c61', label: '#666e36' },
   images: { hero: '/img/fotter.jpg', couple: '/img/IMG_FA56B1C5F58F-1.jpeg', og: '/img/IMG_FA56B1C5F58F-1.jpeg' },
   og: { description: 'Запрошення на весілля' }
