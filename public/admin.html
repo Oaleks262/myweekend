@@ -915,7 +915,7 @@
       <div class="settings-row">
         <div class="settings-field">
           <label>Фон Hero (заголовок)</label>
-          <div class="img-upload-wrap" id="heroImgWrap">
+          <div class="img-upload-wrap">
             <img class="img-preview" id="heroPreview" src="" alt=""/>
             <label class="img-upload-btn">
               Обрати фото
@@ -925,7 +925,7 @@
         </div>
         <div class="settings-field">
           <label>Фото пари (Деталі)</label>
-          <div class="img-upload-wrap" id="coupleImgWrap">
+          <div class="img-upload-wrap">
             <img class="img-preview" id="couplePreview" src="" alt=""/>
             <label class="img-upload-btn">
               Обрати фото
@@ -933,7 +933,31 @@
             </label>
           </div>
         </div>
+        <div class="settings-field">
+          <label>OG-фото (превью у месенджерах)</label>
+          <div class="img-upload-wrap">
+            <img class="img-preview" id="ogPreview" src="" alt=""/>
+            <label class="img-upload-btn">
+              Обрати фото
+              <input type="file" accept="image/*" style="display:none" onchange="uploadSiteImage('og', this)"/>
+            </label>
+          </div>
+          <span style="font-size:11px;color:var(--text-dim);margin-top:4px;">Рекомендовано 1200×630 px</span>
+        </div>
       </div>
+    </div>
+
+    <!-- OG description -->
+    <div class="settings-block">
+      <div class="settings-block__title">Превью у месенджерах / соцмережах</div>
+      <div class="settings-field" style="margin-bottom:0">
+        <label>Підзаголовок (опис під назвою)</label>
+        <input type="text" id="sOgDesc" placeholder="Запрошення на весілля"/>
+      </div>
+      <p style="font-size:12px;color:var(--text-dim);margin-top:12px;line-height:1.6;">
+        Заголовок для гостя формується автоматично: <em style="color:var(--text);">"Ім'я гостя — Запрошення на весілля"</em><br/>
+        Заголовок для головної: <em style="color:var(--text);">"Наречений & Наречена — Весілля [дата]"</em>
+      </p>
     </div>
 
     <!-- Actions -->
@@ -1289,10 +1313,13 @@ function renderSettingsForm() {
   document.getElementById('cSplashNames').value   = s.splashColors?.names      || '#495023';
   document.getElementById('cSplashBtn').value     = s.splashColors?.button     || '#868c61';
   document.getElementById('cSplashLabel').value   = s.splashColors?.label      || '#666e36';
+  document.getElementById('sOgDesc').value = s.og?.description || '';
   const heroPrev   = document.getElementById('heroPreview');
   const couplePrev = document.getElementById('couplePreview');
+  const ogPrev     = document.getElementById('ogPreview');
   if (s.images?.hero)   heroPrev.src   = s.images.hero;
   if (s.images?.couple) couplePrev.src = s.images.couple;
+  if (s.images?.og)     ogPrev.src     = s.images.og;
   renderTimelineEditor(s.timeline || []);
   renderDresscodeEditor(s.dresscode?.colors || []);
 }
@@ -1382,7 +1409,8 @@ async function saveSettingsAdmin() {
       names:      document.getElementById('cSplashNames').value,
       button:     document.getElementById('cSplashBtn').value,
       label:      document.getElementById('cSplashLabel').value
-    }
+    },
+    og: { description: document.getElementById('sOgDesc').value.trim() }
   };
 
   const res = await fetch('/api/site-settings', {
@@ -1417,7 +1445,8 @@ async function uploadSiteImage(type, input) {
     const res = await fetch(`/api/images/${type}`, { method: 'POST', body: formData });
     if (res.ok) {
       const data = await res.json();
-      document.getElementById(type === 'hero' ? 'heroPreview' : 'couplePreview').src = data.url;
+      const previewId = { hero: 'heroPreview', couple: 'couplePreview', og: 'ogPreview' }[type];
+      if (previewId) document.getElementById(previewId).src = data.url;
       if (!siteSettings.images) siteSettings.images = {};
       siteSettings.images[type] = data.url;
     }

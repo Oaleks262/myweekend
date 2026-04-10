@@ -50,6 +50,10 @@
   },
   "images": {
     "hero": "/img/fotter.jpg",
-    "couple": "/img/IMG_FA56B1C5F58F-1.jpeg"
+    "couple": "/img/IMG_FA56B1C5F58F-1.jpeg",
+    "og": "/img/IMG_FA56B1C5F58F-1.jpeg"
+  },
+  "og": {
+    "description": "Запрошення на весілля"
   }
 }

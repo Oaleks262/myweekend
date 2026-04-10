@@ -28,7 +28,8 @@ const DEFAULT_SITE_SETTINGS = {
   colors: { forest: '#333819', gold: '#c4a96a', cream: '#f4f1ec' },
   dresscode: { colors: ['#868581', '#d4d4cf', '#b1b4af', '#8c8f89', '#acb091', '#8a9161', '#6c772d', '#5d662b'] },
   splashColors: { background: '#E5E6E3', names: '#495023', button: '#868c61', label: '#666e36' },
-  images: { hero: '/img/fotter.jpg', couple: '/img/IMG_FA56B1C5F58F-1.jpeg' }
+  images: { hero: '/img/fotter.jpg', couple: '/img/IMG_FA56B1C5F58F-1.jpeg', og: '/img/IMG_FA56B1C5F58F-1.jpeg' },
+  og: { description: 'Запрошення на весілля' }
 };
 
 // Ensure photos directory exists
@@ -75,7 +76,8 @@ function saveSiteSettings(settings) {
 
 // ─── Middleware ───
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+// index: false — щоб "/" не перехоплювався статикою, а йшов у route-handler для OG-тегів
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
 // ─── Multer for file uploads ───
 const upload = multer({
@@ -221,7 +223,7 @@ app.post('/api/site-settings/reset', (req, res) => {
 // ─── API: upload site image (hero or couple) ───
 app.post('/api/images/:type', upload.single('image'), async (req, res) => {
   const type = req.params.type;
-  if (!['hero', 'couple'].includes(type)) return res.status(400).json({ error: 'invalid type' });
+  if (!['hero', 'couple', 'og'].includes(type)) return res.status(400).json({ error: 'invalid type' });
   if (!req.file) return res.status(400).json({ error: 'no file' });
 
   const filename = `custom-${type}.jpg`;
@@ -351,9 +353,34 @@ app.get('/api/photos/download', (req, res) => {
   }
 });
 
-// ─── Home page ───
+// ─── OG tag helper ───
+function buildOgTags({ title, description, imageUrl, pageUrl }) {
+  const esc = s => String(s).replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return `
+  <meta property="og:type"        content="website"/>
+  <meta property="og:title"       content="${esc(title)}"/>
+  <meta property="og:description" content="${esc(description)}"/>
+  <meta property="og:image"       content="${esc(imageUrl)}"/>
+  <meta property="og:url"         content="${esc(pageUrl)}"/>
+  <meta name="twitter:card"       content="summary_large_image"/>
+  <meta name="twitter:title"      content="${esc(title)}"/>
+  <meta name="twitter:description" content="${esc(description)}"/>
+  <meta name="twitter:image"      content="${esc(imageUrl)}"/>`;
+}
+
+// ─── Home page (з OG-тегами) ───
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const s    = loadSiteSettings();
+  const base = `${req.protocol}://${req.get('host')}`;
+  const ogTags = buildOgTags({
+    title:       `${s.names?.groom || 'Олександр'} & ${s.names?.bride || 'Соломія'} — Весілля ${s.date?.display || '23 · 08 · 2026'}`,
+    description: s.og?.description || 'Запрошення на весілля',
+    imageUrl:    base + (s.images?.og || s.images?.couple || '/img/IMG_FA56B1C5F58F-1.jpeg'),
+    pageUrl:     base + '/'
+  });
+  let html = fs.readFileSync(path.join(__dirname, 'public', 'index.html'), 'utf-8');
+  html = html.replace('</head>', ogTags + '\n</head>');
+  res.send(html);
 });
 
 // ─── Admin page ───
@@ -361,10 +388,32 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// ─── Catch-all: serve guest.html for any /:slug path ───
+// ─── Catch-all: serve guest.html з персоналізованими OG-тегами ───
 app.get('/:slug', (req, res) => {
-  if (['favicon.ico','robots.txt'].includes(req.params.slug)) return res.status(404).end();
-  res.sendFile(path.join(__dirname, 'public', 'guest.html'));
+  if (['favicon.ico', 'robots.txt'].includes(req.params.slug)) return res.status(404).end();
+
+  const guests = loadGuests();
+  const guest  = guests.find(g => g.slug === req.params.slug);
+  const s      = loadSiteSettings();
+  const base   = `${req.protocol}://${req.get('host')}`;
+
+  const title = guest
+    ? `${guest.name} — Запрошення на весілля`
+    : `${s.names?.groom || 'Олександр'} & ${s.names?.bride || 'Соломія'}`;
+  const description = guest
+    ? `${s.names?.groom || 'Олександр'} & ${s.names?.bride || 'Соломія'} запрошують вас на весілля ${s.date?.display || '23 · 08 · 2026'}`
+    : (s.og?.description || 'Запрошення на весілля');
+
+  const ogTags = buildOgTags({
+    title,
+    description,
+    imageUrl: base + (s.images?.og || s.images?.couple || '/img/IMG_FA56B1C5F58F-1.jpeg'),
+    pageUrl:  base + '/' + req.params.slug
+  });
+
+  let html = fs.readFileSync(path.join(__dirname, 'public', 'guest.html'), 'utf-8');
+  html = html.replace('</head>', ogTags + '\n</head>');
+  res.send(html);
 });
 
 // ─── Start ───
