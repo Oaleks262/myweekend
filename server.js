@@ -274,6 +274,11 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// ─── Admin page ───
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
 // ─── Catch-all: serve guest.html for any /:slug path ───
 app.get('/:slug', (req, res) => {
   if (['favicon.ico','robots.txt'].includes(req.params.slug)) return res.status(404).end();
