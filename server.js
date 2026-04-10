@@ -202,13 +202,17 @@ app.get('/api/site-settings', (req, res) => {
 app.patch('/api/site-settings', (req, res) => {
   const settings = loadSiteSettings();
   const u = req.body;
-  if (u.names)      Object.assign(settings.names, u.names);
-  if (u.date)       Object.assign(settings.date, u.date);
-  if (u.invitation) Object.assign(settings.invitation, u.invitation);
-  if (u.timeline)   settings.timeline = u.timeline;
-  if (u.details)    Object.assign(settings.details, u.details);
-  if (u.colors)     Object.assign(settings.colors, u.colors);
-  if (u.dresscode)  Object.assign(settings.dresscode, u.dresscode);
+
+  // object fields — deep merge
+  for (const key of ['names', 'date', 'invitation', 'details', 'colors', 'dresscode', 'splashColors', 'og', 'images']) {
+    if (u[key] !== undefined) {
+      if (!settings[key] || typeof settings[key] !== 'object') settings[key] = {};
+      Object.assign(settings[key], u[key]);
+    }
+  }
+  // array field — replace
+  if (u.timeline !== undefined) settings.timeline = u.timeline;
+
   saveSiteSettings(settings);
   res.json(settings);
 });
