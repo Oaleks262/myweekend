@@ -318,7 +318,8 @@
     ]);
     if (!guestRes.ok) throw new Error('not found');
     const guest = await guestRes.json();
-    applySettings(await settingsRes.json());
+    const siteConf = await settingsRes.json();
+    applySettings(siteConf);
 
     // 1. Personalize section title
     document.getElementById('invTitle').textContent = guest.name;
@@ -327,7 +328,9 @@
     document.getElementById('rsvpGuestName').textContent = guest.name;
 
     // 3. Update page title
-    document.title = `${guest.name} — Олександр & Соломія`;
+    const groom = siteConf.names?.groom || 'Олександр';
+    const bride  = siteConf.names?.bride  || 'Соломія';
+    document.title = `${guest.name} — ${groom} & ${bride}`;
 
     // 4. Check if already confirmed
     if (guest.confirmed) {
