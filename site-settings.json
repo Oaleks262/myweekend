@@ -40,7 +40,7 @@
     "cream": "#f4f1ec"
   },
   "dresscode": {
-    "colors": ["#8685810d", "#d4d4cfe8", "#b1b4afe3", "#8c8f89de", "#acb091", "#8a9161", "#6c772d", "#5d662b"]
+    "colors": ["#eeece7", "#d7d7d2", "#b8bbb6", "#999c96", "#acb091", "#8a9161", "#6c772d", "#5d662b"]
   },
   "splashColors": {
     "background": "#E5E6E3",
