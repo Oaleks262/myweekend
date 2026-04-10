@@ -312,9 +312,13 @@
   const slug = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
 
   try {
-    const res   = await fetch(`/api/guest/${slug}`);
-    if (!res.ok) throw new Error('not found');
-    const guest = await res.json();
+    const [guestRes, settingsRes] = await Promise.all([
+      fetch(`/api/guest/${slug}`),
+      fetch('/api/site-settings')
+    ]);
+    if (!guestRes.ok) throw new Error('not found');
+    const guest = await guestRes.json();
+    applySettings(await settingsRes.json());
 
     // 1. Personalize section title
     document.getElementById('invTitle').textContent = guest.name;

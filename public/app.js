@@ -164,6 +164,7 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 // ════════════════════════════════════════════
 //  6. SCROLL ARROW
 // ════════════════════════════════════════════
+
 (function initScrollArrow() {
   const arrow = document.getElementById('scrollArrow');
   if (!arrow) return;
@@ -178,3 +179,88 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     }
   });
 })();
+
+// ════════════════════════════════════════════
+//  7. APPLY SITE SETTINGS
+// ════════════════════════════════════════════
+function applySettings(s) {
+  if (!s) return;
+
+  // CSS variables
+  if (s.colors) {
+    const r = document.documentElement;
+    if (s.colors.forest) {
+      r.style.setProperty('--forest', s.colors.forest);
+      r.style.setProperty('--forest-mid', s.colors.forest);
+      r.style.setProperty('--forest-light', s.colors.forest);
+    }
+    if (s.colors.gold) {
+      r.style.setProperty('--gold', s.colors.gold);
+      r.style.setProperty('--gold-dim', s.colors.gold);
+    }
+    if (s.colors.cream) {
+      r.style.setProperty('--cream', s.colors.cream);
+      r.style.setProperty('--cream-warm', s.colors.cream);
+      r.style.setProperty('--cream-dark', s.colors.cream);
+    }
+  }
+
+  // Names
+  if (s.names) {
+    const heroNames = document.querySelector('.hero__names');
+    if (heroNames) {
+      heroNames.innerHTML = `${s.names.groom}<span class="hero__amp">&amp;</span>${s.names.bride}`;
+    }
+    const splashNames = document.querySelector('.splash__names');
+    if (splashNames) splashNames.textContent = `${s.names.groom} & ${s.names.bride}`;
+    const signs = document.querySelectorAll('.thx__sign');
+    if (signs.length >= 2) signs[1].textContent = `${s.names.groom} & ${s.names.bride}`;
+  }
+
+  // Date display
+  if (s.date) {
+    const heroDate = document.querySelector('.hero__date');
+    if (heroDate) heroDate.textContent = s.date.display;
+    const cdPara = document.querySelector('.cd-para');
+    if (cdPara && s.date.rsvpDeadline) {
+      cdPara.textContent = `Будь ласка, підтвердіть свою присутність на весіллі до ${s.date.rsvpDeadline}.`;
+    }
+  }
+
+  // Invitation text
+  if (s.invitation && s.invitation.text) {
+    const invP = document.querySelector('.inv__text p');
+    if (invP) invP.textContent = s.invitation.text;
+  }
+
+  // Timeline
+  if (s.timeline) {
+    const items = document.querySelectorAll('.tl-item');
+    s.timeline.forEach((ev, i) => {
+      if (!items[i]) return;
+      const timeEl  = items[i].querySelector('.tl-time');
+      const eventEl = items[i].querySelector('.tl-event');
+      const addrEl  = items[i].querySelector('.tl-addr a');
+      if (timeEl)  timeEl.textContent  = ev.time;
+      if (eventEl) eventEl.textContent = ev.event;
+      if (addrEl)  { addrEl.textContent = ev.address; addrEl.href = ev.mapUrl || '#'; }
+    });
+  }
+
+  // Details paragraphs
+  if (s.details) {
+    const thxPs = document.querySelectorAll('.thx__text p');
+    if (thxPs[0] && s.details.text1) thxPs[0].textContent = s.details.text1;
+    if (thxPs[1] && s.details.text2) thxPs[1].textContent = s.details.text2;
+  }
+
+  // Dress code palette
+  if (s.dresscode && s.dresscode.colors) {
+    const palette = document.querySelector('.dc__palette');
+    if (palette) {
+      palette.innerHTML = s.dresscode.colors
+        .map(c => `<div class="dc__sw"><div class="dc__circle" style="background:${c}"></div></div>`)
+        .join('');
+    }
+  }
+}

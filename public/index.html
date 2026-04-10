@@ -245,6 +245,14 @@
 
 <script src="app.js"></script>
 <script>
+// ─── SITE SETTINGS ───
+(async function() {
+  try {
+    const res = await fetch('/api/site-settings');
+    applySettings(await res.json());
+  } catch (e) {}
+})();
+
 // ─── PHOTOS SECTION ───
 (async function loadPhotosSection() {
   try {

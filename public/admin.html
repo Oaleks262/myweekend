@@ -499,6 +499,184 @@
     table { min-width: 700px; }
     .sections-nav { flex-wrap: wrap; }
   }
+
+  /* ═══ SETTINGS ═══ */
+  .settings-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .settings-block__title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+
+  .settings-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .settings-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 160px;
+    margin-bottom: 14px;
+  }
+
+  .settings-field label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .settings-field input[type="text"],
+  .settings-field textarea {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+    resize: vertical;
+  }
+
+  .settings-field input[type="text"]:focus,
+  .settings-field textarea:focus { border-color: var(--gold); }
+
+  .settings-colors {
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+
+  .color-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .color-field input[type="color"] {
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 3px;
+    background: var(--card);
+  }
+
+  .color-field label {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    max-width: 80px;
+    line-height: 1.4;
+  }
+
+  .dc-colors {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+    align-items: center;
+  }
+
+  .dc-color-item {
+    position: relative;
+  }
+
+  .dc-color-input {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 3px;
+    background: var(--card);
+    display: block;
+  }
+
+  .dc-color-del {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 18px;
+    height: 18px;
+    background: var(--red);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    line-height: 18px;
+    text-align: center;
+    padding: 0;
+  }
+
+  .add-color-btn {
+    background: transparent;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: var(--text-dim);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .add-color-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .tl-event-editor {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .te-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+
+  .settings-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .reset-btn {
+    padding: 12px 24px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .reset-btn:hover { border-color: var(--red); color: var(--red); }
 </style>
 </head>
 <body>
@@ -529,6 +707,7 @@
   <div class="sections-nav">
     <button class="section-btn active" data-section="guests">Гості</button>
     <button class="section-btn" data-section="photos">Фотографії</button>
+    <button class="section-btn" data-section="settings">Налаштування</button>
   </div>
 
   <!-- ═══ GUESTS SECTION ═══ -->
@@ -590,6 +769,101 @@
 
     <div class="photos-grid" id="photosGrid"></div>
   </div>
+  <!-- ═══ SETTINGS SECTION ═══ -->
+  <div class="section-panel" id="settingsSection">
+
+    <!-- Names -->
+    <div class="settings-block">
+      <div class="settings-block__title">Імена</div>
+      <div class="settings-row">
+        <div class="settings-field">
+          <label>Наречений</label>
+          <input type="text" id="sGroom" placeholder="Олександр"/>
+        </div>
+        <div class="settings-field">
+          <label>Наречена</label>
+          <input type="text" id="sBride" placeholder="Соломія"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date -->
+    <div class="settings-block">
+      <div class="settings-block__title">Дата</div>
+      <div class="settings-row">
+        <div class="settings-field">
+          <label>Відображення дати</label>
+          <input type="text" id="sDateDisplay" placeholder="23 · 08 · 2026"/>
+        </div>
+        <div class="settings-field">
+          <label>Дедлайн RSVP</label>
+          <input type="text" id="sRsvpDeadline" placeholder="26 червня 2026 року"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invitation text -->
+    <div class="settings-block">
+      <div class="settings-block__title">Текст запрошення</div>
+      <div class="settings-field" style="margin-bottom:0">
+        <label>Абзац запрошення</label>
+        <textarea id="sInvText" rows="4"></textarea>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="settings-block">
+      <div class="settings-block__title">План дня</div>
+      <div id="sTimeline"></div>
+    </div>
+
+    <!-- Details -->
+    <div class="settings-block">
+      <div class="settings-block__title">Деталі (подарунки)</div>
+      <div class="settings-field">
+        <label>Перший абзац</label>
+        <textarea id="sDetailsText1" rows="3"></textarea>
+      </div>
+      <div class="settings-field" style="margin-bottom:0">
+        <label>Другий абзац</label>
+        <textarea id="sDetailsText2" rows="3"></textarea>
+      </div>
+    </div>
+
+    <!-- Site colors -->
+    <div class="settings-block">
+      <div class="settings-block__title">Кольори сайту</div>
+      <div class="settings-colors">
+        <div class="color-field">
+          <input type="color" id="cForest"/>
+          <label>Темний фон</label>
+        </div>
+        <div class="color-field">
+          <input type="color" id="cGold"/>
+          <label>Акцент</label>
+        </div>
+        <div class="color-field">
+          <input type="color" id="cCream"/>
+          <label>Світлий фон</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dresscode colors -->
+    <div class="settings-block">
+      <div class="settings-block__title">Кольори дрескоду</div>
+      <div class="dc-colors" id="sDresscode"></div>
+      <button class="add-color-btn" onclick="addDresscodeColor()">+ Додати колір</button>
+    </div>
+
+    <!-- Actions -->
+    <div class="settings-actions">
+      <button class="btn" id="saveSettingsBtn" onclick="saveSettingsAdmin()">Зберегти зміни</button>
+      <button class="reset-btn" onclick="resetSettingsAdmin()">Скинути до початкових</button>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
@@ -645,6 +919,7 @@ document.getElementById('logoutBtn').addEventListener('click', logout);
 
 if (isLoggedIn()) {
   showMain();
+  loadSiteSettingsAdmin();
 }
 
 // ═══ SECTION NAVIGATION ═══
@@ -906,6 +1181,140 @@ if (isLoggedIn()) {
   loadGuests();
   loadPhotos();
   loadSettings();
+  loadSiteSettingsAdmin();
+}
+
+// ═══ SITE SETTINGS ═══
+let siteSettings = {};
+
+async function loadSiteSettingsAdmin() {
+  const res = await fetch('/api/site-settings');
+  siteSettings = await res.json();
+  renderSettingsForm();
+}
+
+function renderSettingsForm() {
+  const s = siteSettings;
+  document.getElementById('sGroom').value         = s.names?.groom || '';
+  document.getElementById('sBride').value         = s.names?.bride || '';
+  document.getElementById('sDateDisplay').value   = s.date?.display || '';
+  document.getElementById('sRsvpDeadline').value  = s.date?.rsvpDeadline || '';
+  document.getElementById('sInvText').value       = s.invitation?.text || '';
+  document.getElementById('sDetailsText1').value  = s.details?.text1 || '';
+  document.getElementById('sDetailsText2').value  = s.details?.text2 || '';
+  document.getElementById('cForest').value        = s.colors?.forest || '#333819';
+  document.getElementById('cGold').value          = s.colors?.gold   || '#c4a96a';
+  document.getElementById('cCream').value         = s.colors?.cream  || '#f4f1ec';
+  renderTimelineEditor(s.timeline || []);
+  renderDresscodeEditor(s.dresscode?.colors || []);
+}
+
+function renderTimelineEditor(timeline) {
+  document.getElementById('sTimeline').innerHTML = timeline.map((ev, i) => `
+    <div class="tl-event-editor">
+      <div class="te-header">Подія ${i + 1}</div>
+      <div class="settings-row">
+        <div class="settings-field" style="flex:0 0 90px;min-width:90px">
+          <label>Час</label>
+          <input type="text" class="te-time" value="${ev.time}"/>
+        </div>
+        <div class="settings-field">
+          <label>Назва</label>
+          <input type="text" class="te-event" value="${escHtml(ev.event)}"/>
+        </div>
+      </div>
+      <div class="settings-field">
+        <label>Адреса</label>
+        <input type="text" class="te-address" value="${escHtml(ev.address)}"/>
+      </div>
+      <div class="settings-field" style="margin-bottom:0">
+        <label>Посилання на карту</label>
+        <input type="text" class="te-mapurl" value="${escHtml(ev.mapUrl)}"/>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDresscodeEditor(colors) {
+  document.getElementById('sDresscode').innerHTML = colors.map((c, i) => `
+    <div class="dc-color-item">
+      <input type="color" class="dc-color-input" value="${toHex6(c)}"/>
+      <button class="dc-color-del" onclick="removeDresscodeColor(${i})" title="Видалити">&times;</button>
+    </div>
+  `).join('');
+}
+
+function toHex6(color) {
+  // strip alpha from 8-digit hex (#rrggbbaa → #rrggbb)
+  if (/^#[0-9a-fA-F]{8}$/.test(color)) return color.slice(0, 7);
+  if (/^#[0-9a-fA-F]{6}$/.test(color)) return color;
+  return '#888888';
+}
+
+function escHtml(str) {
+  return (str || '').replace(/"/g, '&quot;');
+}
+
+function addDresscodeColor() {
+  const colors = getDresscodeColors();
+  colors.push('#cccccc');
+  renderDresscodeEditor(colors);
+}
+
+function removeDresscodeColor(index) {
+  const colors = getDresscodeColors();
+  colors.splice(index, 1);
+  renderDresscodeEditor(colors);
+}
+
+function getDresscodeColors() {
+  return Array.from(document.querySelectorAll('.dc-color-input')).map(i => i.value);
+}
+
+function getTimelineData() {
+  return Array.from(document.querySelectorAll('.tl-event-editor')).map(el => ({
+    time:    el.querySelector('.te-time').value.trim(),
+    event:   el.querySelector('.te-event').value.trim(),
+    address: el.querySelector('.te-address').value.trim(),
+    mapUrl:  el.querySelector('.te-mapurl').value.trim()
+  }));
+}
+
+async function saveSettingsAdmin() {
+  const update = {
+    names:      { groom: document.getElementById('sGroom').value.trim(), bride: document.getElementById('sBride').value.trim() },
+    date:       { display: document.getElementById('sDateDisplay').value.trim(), rsvpDeadline: document.getElementById('sRsvpDeadline').value.trim() },
+    invitation: { text: document.getElementById('sInvText').value.trim() },
+    timeline:   getTimelineData(),
+    details:    { text1: document.getElementById('sDetailsText1').value.trim(), text2: document.getElementById('sDetailsText2').value.trim() },
+    colors:     { forest: document.getElementById('cForest').value, gold: document.getElementById('cGold').value, cream: document.getElementById('cCream').value },
+    dresscode:  { colors: getDresscodeColors() }
+  };
+
+  const res = await fetch('/api/site-settings', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(update)
+  });
+
+  if (res.ok) {
+    siteSettings = await res.json();
+    const btn = document.getElementById('saveSettingsBtn');
+    const orig = btn.textContent;
+    btn.textContent = 'Збережено ✓';
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#1a1a1a';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; btn.style.color = ''; }, 2000);
+  }
+}
+
+async function resetSettingsAdmin() {
+  if (!confirm('Скинути всі налаштування до початкових значень?')) return;
+  const res = await fetch('/api/site-settings/reset', { method: 'POST' });
+  if (res.ok) {
+    siteSettings = await res.json();
+    renderSettingsForm();
+  }
 }
 </script>
 

@@ -9,7 +9,25 @@ const app  = express();
 const PORT = process.env.PORT || 2308;
 const GUESTS_PATH = path.join(__dirname, 'guests.json');
 const SETTINGS_PATH = path.join(__dirname, 'settings.json');
+const SITE_SETTINGS_PATH = path.join(__dirname, 'site-settings.json');
 const PHOTOS_DIR = path.join(__dirname, 'public', 'photos');
+
+const DEFAULT_SITE_SETTINGS = {
+  names: { groom: 'Олександр', bride: 'Соломія' },
+  date: { display: '23 · 08 · 2026', rsvpDeadline: '26 червня 2026 року' },
+  invitation: { text: 'Ми з радістю та теплом у серці запрошуємо Вас приєднатися до святкування нашого весілля, яке відбудеться вже цього літа. Ми будемо безмежно щасливі, якщо ви розділите з нами радість цього дня.' },
+  timeline: [
+    { time: '14:00', event: 'Зустріч у домі нареченої', address: 'вул. Лютеранська, 10, Київ', mapUrl: 'https://www.google.com/maps/place/Kyiv,+Ukraine/' },
+    { time: '16:00', event: 'Церемонія шлюбу', address: 'Собор Святого Андрія, вул. Андреєвська, 3', mapUrl: 'https://www.google.com/maps/place/Kyiv,+Ukraine/' },
+    { time: '18:30', event: 'Заклад', address: 'Ресторан «Золоті Ворота», вул. Золотої Брами, 7', mapUrl: 'https://www.google.com/maps/place/Kyiv,+Ukraine/' }
+  ],
+  details: {
+    text1: 'Будемо дуже вдячні за будь-який прояв вашої уваги. Та якщо ви роздумуєте над подарунком, найкращою підтримкою для нас стане фінансовий внесок у нашу спільну мрію.',
+    text2: 'Ваш подарунок допоможе нам швидше здійснити цю ціль та зробити наше сімейне життя ще комфортнішим. Дякуємо за розуміння і вашу підтримку.'
+  },
+  colors: { forest: '#333819', gold: '#c4a96a', cream: '#f4f1ec' },
+  dresscode: { colors: ['#868581', '#d4d4cf', '#b1b4af', '#8c8f89', '#acb091', '#8a9161', '#6c772d', '#5d662b'] }
+};
 
 // Ensure photos directory exists
 if (!fs.existsSync(PHOTOS_DIR)) {
@@ -38,6 +56,19 @@ function loadSettings() {
 
 function saveSettings(settings) {
   fs.writeFileSync(SETTINGS_PATH, JSON.stringify(settings, null, 2));
+}
+
+function loadSiteSettings() {
+  try {
+    const raw = fs.readFileSync(SITE_SETTINGS_PATH, 'utf-8');
+    return JSON.parse(raw);
+  } catch (e) {
+    return JSON.parse(JSON.stringify(DEFAULT_SITE_SETTINGS));
+  }
+}
+
+function saveSiteSettings(settings) {
+  fs.writeFileSync(SITE_SETTINGS_PATH, JSON.stringify(settings, null, 2));
 }
 
 // ─── Middleware ───
@@ -156,6 +187,33 @@ app.post('/api/rsvp/:slug', (req, res) => {
 
   fs.writeFileSync(GUESTS_PATH, JSON.stringify(guests, null, 2));
   res.json({ success: true, guest: guests[guestIndex] });
+});
+
+// ─── API: get site settings ───
+app.get('/api/site-settings', (req, res) => {
+  res.json(loadSiteSettings());
+});
+
+// ─── API: update site settings ───
+app.patch('/api/site-settings', (req, res) => {
+  const settings = loadSiteSettings();
+  const u = req.body;
+  if (u.names)      Object.assign(settings.names, u.names);
+  if (u.date)       Object.assign(settings.date, u.date);
+  if (u.invitation) Object.assign(settings.invitation, u.invitation);
+  if (u.timeline)   settings.timeline = u.timeline;
+  if (u.details)    Object.assign(settings.details, u.details);
+  if (u.colors)     Object.assign(settings.colors, u.colors);
+  if (u.dresscode)  Object.assign(settings.dresscode, u.dresscode);
+  saveSiteSettings(settings);
+  res.json(settings);
+});
+
+// ─── API: reset site settings to defaults ───
+app.post('/api/site-settings/reset', (req, res) => {
+  const defaults = JSON.parse(JSON.stringify(DEFAULT_SITE_SETTINGS));
+  saveSiteSettings(defaults);
+  res.json(defaults);
 });
 
 // ═══════════════════════════════════════════
