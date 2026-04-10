@@ -752,7 +752,7 @@ body::after {
 @media (max-width:660px) {
   .hero { padding: 30px 16px 20px; gap: 20px; justify-content: space-around; }
   .hero__bottom { gap: 30px; justify-content: space-around;}
-  .hero__label { margin-bottom: 16px; }
+  .hero__label { margin-bottom: 50px; }
 
   .inv__layout { flex-direction: column; align-items: center; }
   .inv__text { max-width:100%; text-align: center; }
