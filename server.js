@@ -228,17 +228,29 @@ app.post('/api/site-settings/reset', (req, res) => {
   res.json(defaults);
 });
 
-// ─── API: upload site image (hero or couple) ───
+// ─── API: upload site image (hero / couple / og) ───
 app.post('/api/images/:type', upload.single('image'), async (req, res) => {
   const type = req.params.type;
   if (!['hero', 'couple', 'og'].includes(type)) return res.status(400).json({ error: 'invalid type' });
   if (!req.file) return res.status(400).json({ error: 'no file' });
 
-  const filename = `custom-${type}.jpg`;
+  const filename = `custom-${type}.webp`;
   const filepath = path.join(__dirname, 'public', 'img', filename);
 
   try {
-    await sharp(req.file.buffer).jpeg({ quality: 90 }).toFile(filepath);
+    const img = sharp(req.file.buffer);
+
+    if (type === 'hero') {
+      // Фон hero — max 1920px, не збільшуємо
+      await img.resize(1920, null, { withoutEnlargement: true }).webp({ quality: 82 }).toFile(filepath);
+    } else if (type === 'couple') {
+      // Фото пари — max 700px, не збільшуємо
+      await img.resize(700, null, { withoutEnlargement: true }).webp({ quality: 85 }).toFile(filepath);
+    } else if (type === 'og') {
+      // OG-превью — стандарт 1200×630, crop по центру
+      await img.resize(1200, 630, { fit: 'cover', position: 'centre' }).webp({ quality: 85 }).toFile(filepath);
+    }
+
     const settings = loadSiteSettings();
     if (!settings.images) settings.images = {};
     settings.images[type] = `/img/${filename}`;
