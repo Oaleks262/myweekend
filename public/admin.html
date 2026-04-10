@@ -602,32 +602,6 @@
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    touch-action: none;
-  }
-
-  .dc-drag-handle {
-    cursor: grab;
-    color: var(--text-dim);
-    font-size: 16px;
-    line-height: 1;
-    user-select: none;
-    padding: 2px 4px;
-    border-radius: 4px;
-    transition: color 0.2s;
-  }
-  .dc-drag-handle:hover { color: var(--gold); }
-  .dc-drag-handle:active { cursor: grabbing; }
-
-  .dc-color-item.is-dragging { opacity: 0.25; }
-
-  .dc-ghost {
-    position: fixed;
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.85;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
-    border-radius: 50%;
-    transition: none;
   }
 
   .dc-color-input {
@@ -1383,88 +1357,10 @@ function renderTimelineEditor(timeline) {
 function renderDresscodeEditor(colors) {
   document.getElementById('sDresscode').innerHTML = colors.map((c, i) => `
     <div class="dc-color-item" data-index="${i}">
-      <div class="dc-drag-handle" title="Перетягнути">⠿</div>
       <input type="color" class="dc-color-input" value="${toHex6(c)}"/>
       <button class="dc-color-del" onclick="removeDresscodeColor(${i})" title="Видалити">&times;</button>
     </div>
   `).join('');
-  initDresscodeSort();
-}
-
-function initDresscodeSort() {
-  const container = document.getElementById('sDresscode');
-  let dragging = null;
-  let ghost = null;
-  let offsetX = 0, offsetY = 0;
-
-  container.querySelectorAll('.dc-drag-handle').forEach(handle => {
-    handle.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      const item = handle.closest('.dc-color-item');
-      dragging = item;
-
-      const rect = item.getBoundingClientRect();
-      offsetX = e.clientX - rect.left;
-      offsetY = e.clientY - rect.top;
-
-      // Ghost — візуальна копія що слідує за пальцем/мишею
-      ghost = item.querySelector('.dc-color-input').cloneNode();
-      ghost.className = 'dc-ghost';
-      ghost.style.width  = rect.width  + 'px';
-      ghost.style.height = rect.height + 'px';
-      ghost.style.left   = rect.left   + 'px';
-      ghost.style.top    = rect.top    + 'px';
-      ghost.style.background = item.querySelector('.dc-color-input').value;
-      document.body.appendChild(ghost);
-
-      item.classList.add('is-dragging');
-
-      document.addEventListener('pointermove', onMove);
-      document.addEventListener('pointerup', onUp, { once: true });
-    });
-  });
-
-  function onMove(e) {
-    if (!dragging || !ghost) return;
-    e.preventDefault();
-
-    ghost.style.left = (e.clientX - offsetX) + 'px';
-    ghost.style.top  = (e.clientY - offsetY) + 'px';
-
-    // Ховаємо ghost щоб elementFromPoint знайшов елемент під ним
-    ghost.style.display = 'none';
-    const under = document.elementFromPoint(e.clientX, e.clientY);
-    ghost.style.display = '';
-
-    const target = under?.closest('.dc-color-item');
-    if (target && target !== dragging) {
-      const items = [...container.querySelectorAll('.dc-color-item')];
-      const dragIdx   = items.indexOf(dragging);
-      const targetIdx = items.indexOf(target);
-      if (dragIdx < targetIdx) {
-        container.insertBefore(dragging, target.nextSibling);
-      } else {
-        container.insertBefore(dragging, target);
-      }
-    }
-  }
-
-  function onUp() {
-    document.removeEventListener('pointermove', onMove);
-    if (!dragging) return;
-
-    dragging.classList.remove('is-dragging');
-    ghost?.remove();
-    ghost = null;
-
-    // Оновлюємо onclick індекси після перестановки
-    [...container.querySelectorAll('.dc-color-item')].forEach((item, i) => {
-      item.dataset.index = i;
-      item.querySelector('.dc-color-del').setAttribute('onclick', `removeDresscodeColor(${i})`);
-    });
-
-    dragging = null;
-  }
 }
 
 function toHex6(color) {
