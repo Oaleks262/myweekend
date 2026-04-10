@@ -26,7 +26,9 @@ const DEFAULT_SITE_SETTINGS = {
     text2: 'Ваш подарунок допоможе нам швидше здійснити цю ціль та зробити наше сімейне життя ще комфортнішим. Дякуємо за розуміння і вашу підтримку.'
   },
   colors: { forest: '#333819', gold: '#c4a96a', cream: '#f4f1ec' },
-  dresscode: { colors: ['#868581', '#d4d4cf', '#b1b4af', '#8c8f89', '#acb091', '#8a9161', '#6c772d', '#5d662b'] }
+  dresscode: { colors: ['#868581', '#d4d4cf', '#b1b4af', '#8c8f89', '#acb091', '#8a9161', '#6c772d', '#5d662b'] },
+  splashColors: { background: '#E5E6E3', names: '#495023', button: '#868c61', label: '#666e36' },
+  images: { hero: '/img/fotter.jpg', couple: '/img/IMG_FA56B1C5F58F-1.jpeg' }
 };
 
 // Ensure photos directory exists
@@ -214,6 +216,28 @@ app.post('/api/site-settings/reset', (req, res) => {
   const defaults = JSON.parse(JSON.stringify(DEFAULT_SITE_SETTINGS));
   saveSiteSettings(defaults);
   res.json(defaults);
+});
+
+// ─── API: upload site image (hero or couple) ───
+app.post('/api/images/:type', upload.single('image'), async (req, res) => {
+  const type = req.params.type;
+  if (!['hero', 'couple'].includes(type)) return res.status(400).json({ error: 'invalid type' });
+  if (!req.file) return res.status(400).json({ error: 'no file' });
+
+  const filename = `custom-${type}.jpg`;
+  const filepath = path.join(__dirname, 'public', 'img', filename);
+
+  try {
+    await sharp(req.file.buffer).jpeg({ quality: 90 }).toFile(filepath);
+    const settings = loadSiteSettings();
+    if (!settings.images) settings.images = {};
+    settings.images[type] = `/img/${filename}?t=${Date.now()}`;
+    saveSiteSettings(settings);
+    res.json({ url: settings.images[type] });
+  } catch (e) {
+    console.error('Image upload error:', e);
+    res.status(500).json({ error: 'Upload failed' });
+  }
 });
 
 // ═══════════════════════════════════════════

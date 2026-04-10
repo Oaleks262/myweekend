@@ -263,4 +263,28 @@ function applySettings(s) {
         .join('');
     }
   }
+
+  // Splash screen colors
+  if (s.splashColors) {
+    const splash = document.querySelector('.splash');
+    if (splash) splash.style.background = s.splashColors.background;
+    const splashLabel = document.querySelector('.splash__label');
+    if (splashLabel) splashLabel.style.color = s.splashColors.label;
+    const splashNames = document.querySelector('.splash__names');
+    if (splashNames) splashNames.style.color = s.splashColors.names;
+    const splashBtn = document.querySelector('.splash__btn');
+    if (splashBtn) splashBtn.style.background = s.splashColors.button;
+  }
+
+  // Images
+  if (s.images) {
+    if (s.images.hero) {
+      const heroPhoto = document.querySelector('.hero__photo');
+      if (heroPhoto) heroPhoto.style.backgroundImage = `url('${s.images.hero}')`;
+    }
+    if (s.images.couple) {
+      const coupleImg = document.querySelector('.thx__photo img');
+      if (coupleImg) coupleImg.src = s.images.couple;
+    }
+  }
 }

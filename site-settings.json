@@ -41,5 +41,15 @@
   },
   "dresscode": {
     "colors": ["#868581", "#d4d4cf", "#b1b4af", "#8c8f89", "#acb091", "#8a9161", "#6c772d", "#5d662b"]
+  },
+  "splashColors": {
+    "background": "#E5E6E3",
+    "names": "#495023",
+    "button": "#868c61",
+    "label": "#666e36"
+  },
+  "images": {
+    "hero": "/img/fotter.jpg",
+    "couple": "/img/IMG_FA56B1C5F58F-1.jpeg"
   }
 }
