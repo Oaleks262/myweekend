@@ -32,9 +32,13 @@ const DEFAULT_SITE_SETTINGS = {
   og: { description: 'Запрошення на весілля' }
 };
 
-// Ensure photos directory exists
+// Ensure required directories exist
 if (!fs.existsSync(PHOTOS_DIR)) {
   fs.mkdirSync(PHOTOS_DIR, { recursive: true });
+}
+const IMG_DIR = path.join(__dirname, 'public', 'img');
+if (!fs.existsSync(IMG_DIR)) {
+  fs.mkdirSync(IMG_DIR, { recursive: true });
 }
 
 // ─── Load helpers ───
@@ -237,9 +241,9 @@ app.post('/api/images/:type', upload.single('image'), async (req, res) => {
     await sharp(req.file.buffer).jpeg({ quality: 90 }).toFile(filepath);
     const settings = loadSiteSettings();
     if (!settings.images) settings.images = {};
-    settings.images[type] = `/img/${filename}?t=${Date.now()}`;
+    settings.images[type] = `/img/${filename}`;
     saveSiteSettings(settings);
-    res.json({ url: settings.images[type] });
+    res.json({ url: `/img/${filename}?t=${Date.now()}` }); // cache-bust лише для preview в адмінці
   } catch (e) {
     console.error('Image upload error:', e);
     res.status(500).json({ error: 'Upload failed' });
