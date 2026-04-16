@@ -394,7 +394,7 @@ app.get('/', (req, res) => {
   const base = `${req.protocol}://${req.get('host')}`;
   const ogTags = buildOgTags({
     title:       `${s.names?.groom || 'Олександр'} & ${s.names?.bride || 'Соломія'} — Весілля ${s.date?.display || '23 · 08 · 2026'}`,
-    description: s.og?.description || 'Запрошення на весілля',
+    description: s.invitation?.text || s.og?.description || 'Запрошення на весілля',
     imageUrl:    base + (s.images?.og || s.images?.couple || '/img/IMG_FA56B1C5F58F-1.jpeg'),
     pageUrl:     base + '/'
   });
@@ -417,12 +417,8 @@ app.get('/:slug', (req, res) => {
   const s      = loadSiteSettings();
   const base   = `${req.protocol}://${req.get('host')}`;
 
-  const title = guest
-    ? `${guest.name} — Запрошення на весілля`
-    : `${s.names?.groom || 'Олександр'} & ${s.names?.bride || 'Соломія'}`;
-  const description = guest
-    ? `${s.names?.groom || 'Олександр'} & ${s.names?.bride || 'Соломія'} запрошують вас на весілля ${s.date?.display || '23 · 08 · 2026'}`
-    : (s.og?.description || 'Запрошення на весілля');
+  const title = `${s.names?.groom || 'Олександр'} & ${s.names?.bride || 'Соломія'} — Весілля ${s.date?.display || '23 · 08 · 2026'}`;
+  const description = s.invitation?.text || s.og?.description || 'Запрошення на весілля';
 
   const ogTags = buildOgTags({
     title,
