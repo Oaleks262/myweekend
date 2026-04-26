@@ -273,6 +273,11 @@
   tr:hover { background: rgba(255,255,255,0.02); }
 
   .guest-name { font-weight: 500; }
+  .name-edit-input { background: var(--bg); border: 1px solid var(--gold); border-radius: 6px; color: var(--text); padding: 4px 8px; font-size: 14px; width: 140px; }
+  .edit-btn { background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); font-size: 12px; padding: 4px 8px; cursor: pointer; }
+  .edit-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .save-btn { background: var(--gold); border: none; border-radius: 6px; color: #fff; font-size: 12px; padding: 4px 10px; cursor: pointer; margin-left: 4px; }
+  .cancel-btn { background: transparent; border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); font-size: 12px; padding: 4px 8px; cursor: pointer; margin-left: 2px; }
 
   .guest-link {
     color: var(--gold);
@@ -1080,8 +1085,11 @@ function renderTable() {
   const baseUrl = window.location.origin;
 
   tbody.innerHTML = filtered.map(g => `
-    <tr data-id="${g.id}">
-      <td class="guest-name">${g.name}</td>
+    <tr data-id="${g.id}" data-slug="${g.slug}">
+      <td class="guest-name">
+        <span class="name-text">${g.name}</span>
+        <button class="edit-btn" onclick="startEditName(this)" style="margin-left:6px;">✎</button>
+      </td>
       <td>
         <input type="text" class="phone-input" value="${g.phone || ''}" placeholder="+380..."
           onchange="updatePhone('${g.slug}', this.value)"/>
@@ -1133,6 +1141,32 @@ async function updatePhone(slug, phone) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ phone })
   });
+}
+
+function startEditName(btn) {
+  const td = btn.closest('td');
+  const nameSpan = td.querySelector('.name-text');
+  const currentName = nameSpan.textContent;
+  td.innerHTML = `
+    <input class="name-edit-input" value="${currentName}" />
+    <button class="save-btn" onclick="saveEditName(this)">Зберегти</button>
+    <button class="cancel-btn" onclick="loadGuests()">✕</button>
+  `;
+  td.querySelector('.name-edit-input').focus();
+}
+
+async function saveEditName(btn) {
+  const td = btn.closest('td');
+  const tr = td.closest('tr');
+  const oldSlug = tr.dataset.slug;
+  const newName = td.querySelector('.name-edit-input').value.trim();
+  if (!newName) return;
+  const res = await fetch(`${API}/guest/${oldSlug}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: newName })
+  });
+  if (res.ok) await loadGuests();
 }
 
 function copyLink(slug, btn) {

@@ -160,9 +160,28 @@ app.patch('/api/guest/:slug', (req, res) => {
     return res.status(404).json({ error: 'guest not found' });
   }
 
-  const { phone } = req.body;
+  const { phone, name } = req.body;
   if (phone !== undefined) {
     guests[guestIndex].phone = phone;
+  }
+
+  if (name !== undefined && name.trim()) {
+    const map = {
+      'а':'a','б':'b','в':'v','г':'h','ґ':'g','д':'d','е':'e','є':'ie',
+      'ж':'zh','з':'z','и':'y','і':'i','ї':'i','й':'i','к':'k','л':'l',
+      'м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u',
+      'ф':'f','х':'kh','ц':'ts','ч':'ch','ш':'sh','щ':'shch','ь':'','ъ':'',
+      'э':'e','ю':'iu','я':'ia','ё':'io'
+    };
+    let newSlug = name.trim().toLowerCase().split('').map(ch => map[ch] || ch).join('')
+      .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    const baseSlug = newSlug;
+    let counter = 2;
+    while (guests.find((g, i) => g.slug === newSlug && i !== guestIndex)) {
+      newSlug = `${baseSlug}-${counter++}`;
+    }
+    guests[guestIndex].name = name.trim();
+    guests[guestIndex].slug = newSlug;
   }
 
   fs.writeFileSync(GUESTS_PATH, JSON.stringify(guests, null, 2));
