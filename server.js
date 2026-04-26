@@ -124,14 +124,16 @@ app.post('/api/guests', (req, res) => {
     'э':'e','ю':'iu','я':'ia','ё':'io'
   };
 
-  const slug = name.trim().toLowerCase().split('').map(ch => map[ch] || ch).join('')
+  let slug = name.trim().toLowerCase().split('').map(ch => map[ch] || ch).join('')
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
 
-  if (guests.find(g => g.slug === slug)) {
-    return res.status(409).json({ error: 'slug already exists', slug });
+  const baseSlug = slug;
+  let counter = 2;
+  while (guests.find(g => g.slug === slug)) {
+    slug = `${baseSlug}-${counter++}`;
   }
 
   const { phone } = req.body;
