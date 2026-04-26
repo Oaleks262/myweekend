@@ -61,6 +61,37 @@
     transition: background 0.3s;
   }
   .notfound a:hover { background: #d4bb7e; }
+
+  .seating-card {
+    margin-top: 20px;
+    background: rgba(196,169,106,0.08);
+    border: 1px solid rgba(196,169,106,0.25);
+    border-radius: 12px;
+    padding: 18px 22px;
+    text-align: left;
+  }
+  .seating-card__table {
+    font-family: 'Great Vibes', cursive;
+    font-size: 26px;
+    color: var(--gold);
+    margin-bottom: 6px;
+  }
+  .seating-card__label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(244,241,236,0.45);
+    margin-bottom: 10px;
+  }
+  .seating-card__neighbors {
+    font-size: 13px;
+    color: rgba(244,241,236,0.7);
+    line-height: 1.6;
+  }
+  .seating-card__neighbors strong {
+    color: var(--cream);
+    font-weight: 500;
+  }
 </style>
 </head>
 <body>
@@ -254,10 +285,12 @@
       <div class="rsvp__ok" id="rOk">
         <span class="rsvp__ok-heart">♥</span>
         <p>Дякуємо! Ми дуже очікуємо Вас на нашому святі 23 серпня.</p>
+        <div class="seating-card" id="seatingCardOk" style="display:none;"></div>
       </div>
       <div class="rsvp__already" id="rAlready">
         <span class="rsvp__ok-heart">✓</span>
         <p>Ви вже підтвердили свою присутність. Дякуємо!</p>
+        <div class="seating-card" id="seatingCardAlready" style="display:none;"></div>
       </div>
     </div>
   </div>
@@ -336,6 +369,7 @@
     if (guest.confirmed) {
       document.getElementById('rsvpForm').style.display = 'none';
       document.getElementById('rAlready').style.display = 'block';
+      showSeatingCard('seatingCardAlready', slug);
     }
 
     // 5. RSVP button handler
@@ -345,6 +379,7 @@
         if (rsvpRes.ok) {
           document.getElementById('rsvpForm').style.display = 'none';
           document.getElementById('rOk').style.display = 'block';
+          showSeatingCard('seatingCardOk', slug);
         }
       } catch (err) {
         console.error('RSVP error:', err);
@@ -393,6 +428,24 @@ async function loadPhotosSection() {
   } catch (e) {
     console.error('Photos load error:', e);
   }
+}
+
+async function showSeatingCard(cardId, slug) {
+  try {
+    const res = await fetch(`/api/guest/${slug}/seating`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.table) return;
+
+    const card = document.getElementById(cardId);
+    let html = `<div class="seating-card__label">Ваше місце</div>
+      <div class="seating-card__table">Стіл №${data.table}</div>`;
+    if (data.neighbors && data.neighbors.length > 0) {
+      html += `<div class="seating-card__neighbors">Поруч з вами: <strong>${data.neighbors.join(', ')}</strong></div>`;
+    }
+    card.innerHTML = html;
+    card.style.display = 'block';
+  } catch (e) {}
 }
 </script>
 </body>

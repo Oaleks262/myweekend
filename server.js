@@ -160,9 +160,13 @@ app.patch('/api/guest/:slug', (req, res) => {
     return res.status(404).json({ error: 'guest not found' });
   }
 
-  const { phone, name } = req.body;
+  const { phone, name, table } = req.body;
   if (phone !== undefined) {
     guests[guestIndex].phone = phone;
+  }
+
+  if (table !== undefined) {
+    guests[guestIndex].table = table;
   }
 
   if (name !== undefined && name.trim()) {
@@ -200,6 +204,31 @@ app.delete('/api/guest/:slug', (req, res) => {
   guests.splice(guestIndex, 1);
   fs.writeFileSync(GUESTS_PATH, JSON.stringify(guests, null, 2));
   res.json({ success: true });
+});
+
+// ─── API: get seating info for a guest ───
+app.get('/api/guest/:slug/seating', (req, res) => {
+  const guests = loadGuests();
+  const guest = guests.find(g => g.slug === req.params.slug);
+  if (!guest) return res.status(404).json({ error: 'not found' });
+  if (!guest.table) return res.json({ table: null });
+  const neighbors = guests
+    .filter(g => g.slug !== req.params.slug && g.table === guest.table)
+    .map(g => g.name);
+  res.json({ table: guest.table, neighbors });
+});
+
+// ─── API: batch update seating ───
+app.patch('/api/guests/seating', (req, res) => {
+  const assignments = req.body;
+  if (!Array.isArray(assignments)) return res.status(400).json({ error: 'array expected' });
+  const guests = loadGuests();
+  assignments.forEach(({ slug, table }) => {
+    const g = guests.find(g => g.slug === slug);
+    if (g) g.table = table || null;
+  });
+  fs.writeFileSync(GUESTS_PATH, JSON.stringify(guests, null, 2));
+  res.json({ ok: true });
 });
 
 // ─── API: RSVP confirm ───
