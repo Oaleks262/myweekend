@@ -717,16 +717,19 @@
 
   .img-upload-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-  .seat-table-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-  .seat-table-head { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .seat-table-title { font-size: 14px; font-weight: 600; color: var(--gold); }
-  .seat-table-count { font-size: 12px; color: var(--text-dim); }
-  .seat-guest-row { display: flex; align-items: center; padding: 8px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); gap: 10px; }
-  .seat-guest-row:last-child { border-bottom: none; }
-  .seat-guest-name { flex: 1; font-size: 13px; color: var(--text); }
-  .seat-table-sel { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 3px 6px; font-size: 12px; cursor: pointer; }
-  .seat-unassigned { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
-  .seat-unassigned-title { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; font-weight: 600; }
+  .seat-table-card { background: var(--card); border: 2px solid var(--border); border-radius: 10px; overflow: hidden; min-height: 80px; transition: border-color 0.15s; }
+  .seat-table-card.drag-over { border-color: var(--gold); background: rgba(196,169,106,0.06); }
+  .seat-table-head { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .seat-table-title { font-size: 13px; font-weight: 600; color: var(--gold); }
+  .seat-table-count { font-size: 11px; color: var(--text-dim); }
+  .seat-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; min-height: 44px; }
+  .seat-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--text); cursor: grab; user-select: none; touch-action: none; transition: background 0.15s, border-color 0.15s; }
+  .seat-chip:hover { border-color: var(--gold); color: var(--gold); }
+  .seat-chip.dragging { opacity: 0.3; }
+  .seat-chip-ghost { position: fixed; pointer-events: none; z-index: 9999; background: var(--gold); color: #1a1a1a; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
+  .seat-unassigned { background: var(--card); border: 2px dashed var(--border); border-radius: 10px; padding: 12px; transition: border-color 0.15s; }
+  .seat-unassigned.drag-over { border-color: var(--gold); background: rgba(196,169,106,0.06); }
+  .seat-unassigned-title { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.5px; }
 </style>
 </head>
 <body>
@@ -807,15 +810,15 @@
         <label style="font-size:13px;color:var(--text-dim);display:flex;align-items:center;gap:6px;">
           <input type="checkbox" id="onlyConfirmed" checked/> Тільки підтверджені
         </label>
+        <button class="edit-btn" onclick="loadSeatingSection()">↺ Оновити</button>
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="save-btn" style="padding:8px 20px;" onclick="autoAssignSeating()">Автоматично розсадити</button>
-        <button class="save-btn" style="padding:8px 20px;background:var(--green,#5a7a3a);" onclick="saveSeating()" id="seatingSaveBtn">Зберегти</button>
+        <button class="save-btn" style="padding:8px 20px;" onclick="saveSeating()" id="seatingSaveBtn">Зберегти розсадку</button>
         <span id="seatingMsg" style="font-size:12px;color:var(--text-dim);align-self:center;"></span>
       </div>
     </div>
-    <div id="seatingTables" style="display:grid;gap:16px;margin-top:16px;"></div>
     <div id="seatingUnassigned" style="margin-top:16px;"></div>
+    <div id="seatingTables" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:16px;"></div>
   </div>
 
   <!-- ═══ PHOTOS SECTION ═══ -->
@@ -1569,50 +1572,82 @@ function renderSeatingTables() {
     else unassigned.push(g);
   });
 
-  const opts = Array.from({ length: tableCount }, (_, i) =>
-    `<option value="${i + 1}">Стіл ${i + 1}</option>`).join('') + '<option value="">—</option>';
+  // Unassigned pool
+  const ua = document.getElementById('seatingUnassigned');
+  ua.innerHTML = `<div class="seat-unassigned" data-zone="0">
+    <div class="seat-unassigned-title">Без столу — ${unassigned.length} ${unassigned.length === 1 ? 'гість' : 'гостей'}</div>
+    <div class="seat-chips">${unassigned.map(g => chipHtml(g)).join('')}</div>
+  </div>`;
 
+  // Table cards
   document.getElementById('seatingTables').innerHTML = Object.entries(tables).map(([tNum, tGuests]) => `
-    <div class="seat-table-card">
+    <div class="seat-table-card" data-zone="${tNum}">
       <div class="seat-table-head">
         <span class="seat-table-title">Стіл ${tNum}</span>
         <span class="seat-table-count">${tGuests.length} осіб</span>
       </div>
-      ${tGuests.length ? tGuests.map(g => seatGuestRow(g, tNum, opts)).join('') : '<div style="padding:12px 16px;font-size:12px;color:var(--text-dim);">Порожній</div>'}
+      <div class="seat-chips">${tGuests.map(g => chipHtml(g)).join('')}</div>
     </div>
   `).join('');
 
-  const ua = document.getElementById('seatingUnassigned');
-  if (unassigned.length) {
-    ua.innerHTML = `<div class="seat-unassigned"><div class="seat-unassigned-title">Без столу (${unassigned.length})</div>${unassigned.map(g => seatGuestRow(g, '', opts)).join('')}</div>`;
-  } else {
-    ua.innerHTML = '';
-  }
+  initSeatDnd();
 }
 
-function seatGuestRow(g, currentTable, opts) {
-  const selectedOpts = opts.replace(`value="${currentTable}"`, `value="${currentTable}" selected`);
-  return `<div class="seat-guest-row">
-    <span class="seat-guest-name">${g.name}</span>
-    <select class="seat-table-sel" onchange="changeGuestTable('${g.slug}', this.value)">${selectedOpts}</select>
-  </div>`;
+function chipHtml(g) {
+  return `<div class="seat-chip" data-slug="${g.slug}">${g.name}</div>`;
 }
 
-function changeGuestTable(slug, table) {
-  const idx = seatingGuests.findIndex(g => g.slug === slug);
-  if (idx !== -1) seatingGuests[idx].table = table || null;
-  renderSeatingTables();
-}
+function initSeatDnd() {
+  let dragging = null, ghost = null, ox = 0, oy = 0;
 
-function autoAssignSeating() {
-  const tableCount = parseInt(document.getElementById('tableCount').value) || 4;
-  const list = getSeatingList();
-  const shuffled = [...list].sort(() => Math.random() - 0.5);
-  shuffled.forEach((g, i) => {
-    const idx = seatingGuests.findIndex(sg => sg.slug === g.slug);
-    if (idx !== -1) seatingGuests[idx].table = String((i % tableCount) + 1);
+  document.querySelectorAll('#seatingSection .seat-chip').forEach(chip => {
+    chip.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      dragging = chip;
+      const r = chip.getBoundingClientRect();
+      ox = e.clientX - r.left; oy = e.clientY - r.top;
+      ghost = document.createElement('div');
+      ghost.className = 'seat-chip-ghost';
+      ghost.textContent = chip.textContent;
+      ghost.style.left = r.left + 'px';
+      ghost.style.top  = r.top  + 'px';
+      document.body.appendChild(ghost);
+      chip.classList.add('dragging');
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp, { once: true });
+    });
   });
-  renderSeatingTables();
+
+  function onMove(e) {
+    if (!ghost) return;
+    ghost.style.left = (e.clientX - ox) + 'px';
+    ghost.style.top  = (e.clientY - oy) + 'px';
+    document.querySelectorAll('#seatingSection [data-zone]').forEach(z => z.classList.remove('drag-over'));
+    ghost.style.display = 'none';
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    ghost.style.display = '';
+    const zone = el?.closest('[data-zone]');
+    if (zone) zone.classList.add('drag-over');
+  }
+
+  function onUp(e) {
+    document.removeEventListener('pointermove', onMove);
+    document.querySelectorAll('#seatingSection [data-zone]').forEach(z => z.classList.remove('drag-over'));
+    ghost?.remove(); ghost = null;
+    if (!dragging) return;
+    dragging.classList.remove('dragging');
+
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const zone = el?.closest('[data-zone]');
+    if (zone) {
+      const newTable = zone.dataset.zone === '0' ? null : zone.dataset.zone;
+      const slug = dragging.dataset.slug;
+      const idx = seatingGuests.findIndex(g => g.slug === slug);
+      if (idx !== -1) seatingGuests[idx].table = newTable;
+      renderSeatingTables();
+    }
+    dragging = null;
+  }
 }
 
 async function saveSeating() {
