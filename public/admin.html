@@ -717,19 +717,6 @@
 
   .img-upload-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-  .seat-table-card { background: var(--card); border: 2px solid var(--border); border-radius: 10px; overflow: hidden; min-height: 80px; transition: border-color 0.15s; }
-  .seat-table-card.drag-over { border-color: var(--gold); background: rgba(196,169,106,0.06); }
-  .seat-table-head { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-  .seat-table-title { font-size: 13px; font-weight: 600; color: var(--gold); }
-  .seat-table-count { font-size: 11px; color: var(--text-dim); }
-  .seat-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; min-height: 44px; }
-  .seat-chip { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: var(--text); cursor: grab; user-select: none; touch-action: none; transition: background 0.15s, border-color 0.15s; }
-  .seat-chip:hover { border-color: var(--gold); color: var(--gold); }
-  .seat-chip.dragging { opacity: 0.3; }
-  .seat-chip-ghost { position: fixed; pointer-events: none; z-index: 9999; background: var(--gold); color: #1a1a1a; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 500; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
-  .seat-unassigned { background: var(--card); border: 2px dashed var(--border); border-radius: 10px; padding: 12px; transition: border-color 0.15s; }
-  .seat-unassigned.drag-over { border-color: var(--gold); background: rgba(196,169,106,0.06); }
-  .seat-unassigned-title { font-size: 12px; color: var(--text-dim); margin-bottom: 8px; font-weight: 600; letter-spacing: 0.5px; }
 </style>
 </head>
 <body>
@@ -759,7 +746,6 @@
   <!-- Section Navigation -->
   <div class="sections-nav">
     <button class="section-btn active" data-section="guests">Гості</button>
-    <button class="section-btn" data-section="seating">Розсадка</button>
     <button class="section-btn" data-section="photos">Фотографії</button>
     <button class="section-btn" data-section="settings">Налаштування</button>
   </div>
@@ -796,29 +782,6 @@
         <p>Немає гостей для відображення</p>
       </div>
     </div>
-  </div>
-
-  <!-- ═══ SEATING SECTION ═══ -->
-  <div class="section-panel" id="seatingSection">
-    <div class="settings-block">
-      <div class="settings-block__title">Розсадка гостей</div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:16px;">
-        <label style="font-size:13px;color:var(--text-dim);">Кількість столів:
-          <input type="number" id="tableCount" value="4" min="1" max="20"
-            style="width:60px;margin-left:6px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:4px 8px;font-size:13px;"/>
-        </label>
-        <label style="font-size:13px;color:var(--text-dim);display:flex;align-items:center;gap:6px;">
-          <input type="checkbox" id="onlyConfirmed" checked/> Тільки підтверджені
-        </label>
-        <button class="edit-btn" onclick="loadSeatingSection()">↺ Оновити</button>
-      </div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="save-btn" style="padding:8px 20px;" onclick="saveSeating()" id="seatingSaveBtn">Зберегти розсадку</button>
-        <span id="seatingMsg" style="font-size:12px;color:var(--text-dim);align-self:center;"></span>
-      </div>
-    </div>
-    <div id="seatingUnassigned" style="margin-top:16px;"></div>
-    <div id="seatingTables" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:16px;"></div>
   </div>
 
   <!-- ═══ PHOTOS SECTION ═══ -->
@@ -892,6 +855,7 @@
     <div class="settings-block">
       <div class="settings-block__title">План дня</div>
       <div id="sTimeline"></div>
+      <button class="add-color-btn" onclick="addTimelineEvent()">+ Додати подію</button>
     </div>
 
     <!-- Details -->
@@ -1080,7 +1044,6 @@ document.querySelectorAll('.section-btn').forEach(btn => {
     document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(btn.dataset.section + 'Section').classList.add('active');
-    if (btn.dataset.section === 'seating') loadSeatingSection();
   });
 });
 
@@ -1404,7 +1367,10 @@ function renderSettingsForm() {
 function renderTimelineEditor(timeline) {
   document.getElementById('sTimeline').innerHTML = timeline.map((ev, i) => `
     <div class="tl-event-editor">
-      <div class="te-header">Подія ${i + 1}</div>
+      <div class="te-header" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>Подія ${i + 1}</span>
+        <button onclick="removeTimelineEvent(${i})" style="background:transparent;border:1px solid var(--red);border-radius:6px;color:var(--red);font-size:11px;padding:3px 10px;cursor:pointer;">✕ Видалити</button>
+      </div>
       <div class="settings-row">
         <div class="settings-field" style="flex:0 0 90px;min-width:90px">
           <label>Час</label>
@@ -1425,6 +1391,18 @@ function renderTimelineEditor(timeline) {
       </div>
     </div>
   `).join('');
+}
+
+function addTimelineEvent() {
+  const timeline = getTimelineData();
+  timeline.push({ time: '', event: '', address: '', mapUrl: '' });
+  renderTimelineEditor(timeline);
+}
+
+function removeTimelineEvent(index) {
+  const timeline = getTimelineData();
+  timeline.splice(index, 1);
+  renderTimelineEditor(timeline);
 }
 
 function renderDresscodeEditor(colors) {
@@ -1544,129 +1522,6 @@ async function resetSettingsAdmin() {
   }
 }
 
-// ═══ SEATING ═══
-let seatingGuests = [];
-
-async function loadSeatingSection() {
-  const res = await fetch(`${API}/guests`);
-  seatingGuests = await res.json();
-  renderSeatingTables();
-}
-
-function getSeatingList() {
-  const onlyConfirmed = document.getElementById('onlyConfirmed').checked;
-  return onlyConfirmed ? seatingGuests.filter(g => g.confirmed) : seatingGuests;
-}
-
-function renderSeatingTables() {
-  const tableCount = parseInt(document.getElementById('tableCount').value) || 4;
-  const list = getSeatingList();
-
-  const tables = {};
-  for (let i = 1; i <= tableCount; i++) tables[i] = [];
-  const unassigned = [];
-
-  list.forEach(g => {
-    const t = g.table ? parseInt(g.table) : null;
-    if (t && t >= 1 && t <= tableCount) tables[t].push(g);
-    else unassigned.push(g);
-  });
-
-  // Unassigned pool
-  const ua = document.getElementById('seatingUnassigned');
-  ua.innerHTML = `<div class="seat-unassigned" data-zone="0">
-    <div class="seat-unassigned-title">Без столу — ${unassigned.length} ${unassigned.length === 1 ? 'гість' : 'гостей'}</div>
-    <div class="seat-chips">${unassigned.map(g => chipHtml(g)).join('')}</div>
-  </div>`;
-
-  // Table cards
-  document.getElementById('seatingTables').innerHTML = Object.entries(tables).map(([tNum, tGuests]) => `
-    <div class="seat-table-card" data-zone="${tNum}">
-      <div class="seat-table-head">
-        <span class="seat-table-title">Стіл ${tNum}</span>
-        <span class="seat-table-count">${tGuests.length} осіб</span>
-      </div>
-      <div class="seat-chips">${tGuests.map(g => chipHtml(g)).join('')}</div>
-    </div>
-  `).join('');
-
-  initSeatDnd();
-}
-
-function chipHtml(g) {
-  return `<div class="seat-chip" data-slug="${g.slug}">${g.name}</div>`;
-}
-
-function initSeatDnd() {
-  let dragging = null, ghost = null, ox = 0, oy = 0;
-
-  document.querySelectorAll('#seatingSection .seat-chip').forEach(chip => {
-    chip.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      dragging = chip;
-      const r = chip.getBoundingClientRect();
-      ox = e.clientX - r.left; oy = e.clientY - r.top;
-      ghost = document.createElement('div');
-      ghost.className = 'seat-chip-ghost';
-      ghost.textContent = chip.textContent;
-      ghost.style.left = r.left + 'px';
-      ghost.style.top  = r.top  + 'px';
-      document.body.appendChild(ghost);
-      chip.classList.add('dragging');
-      document.addEventListener('pointermove', onMove);
-      document.addEventListener('pointerup', onUp, { once: true });
-    });
-  });
-
-  function onMove(e) {
-    if (!ghost) return;
-    ghost.style.left = (e.clientX - ox) + 'px';
-    ghost.style.top  = (e.clientY - oy) + 'px';
-    document.querySelectorAll('#seatingSection [data-zone]').forEach(z => z.classList.remove('drag-over'));
-    ghost.style.display = 'none';
-    const el = document.elementFromPoint(e.clientX, e.clientY);
-    ghost.style.display = '';
-    const zone = el?.closest('[data-zone]');
-    if (zone) zone.classList.add('drag-over');
-  }
-
-  function onUp(e) {
-    document.removeEventListener('pointermove', onMove);
-    document.querySelectorAll('#seatingSection [data-zone]').forEach(z => z.classList.remove('drag-over'));
-    ghost?.remove(); ghost = null;
-    if (!dragging) return;
-    dragging.classList.remove('dragging');
-
-    const el = document.elementFromPoint(e.clientX, e.clientY);
-    const zone = el?.closest('[data-zone]');
-    if (zone) {
-      const newTable = zone.dataset.zone === '0' ? null : zone.dataset.zone;
-      const slug = dragging.dataset.slug;
-      const idx = seatingGuests.findIndex(g => g.slug === slug);
-      if (idx !== -1) seatingGuests[idx].table = newTable;
-      renderSeatingTables();
-    }
-    dragging = null;
-  }
-}
-
-async function saveSeating() {
-  const btn = document.getElementById('seatingSaveBtn');
-  const msg = document.getElementById('seatingMsg');
-  btn.disabled = true;
-  const assignments = seatingGuests.map(g => ({ slug: g.slug, table: g.table || null }));
-  const res = await fetch(`${API}/guests/seating`, {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(assignments)
-  });
-  btn.disabled = false;
-  msg.textContent = res.ok ? '✓ Збережено' : 'Помилка';
-  setTimeout(() => msg.textContent = '', 2500);
-}
-
-document.getElementById('tableCount').addEventListener('change', renderSeatingTables);
-document.getElementById('onlyConfirmed').addEventListener('change', renderSeatingTables);
 </script>
 
 </body>
