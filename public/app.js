@@ -233,18 +233,26 @@ function applySettings(s) {
     if (invP) invP.textContent = s.invitation.text;
   }
 
-  // Timeline
+  // Timeline — rebuild DOM so added/removed events are reflected
   if (s.timeline) {
-    const items = document.querySelectorAll('.tl-item');
-    s.timeline.forEach((ev, i) => {
-      if (!items[i]) return;
-      const timeEl  = items[i].querySelector('.tl-time');
-      const eventEl = items[i].querySelector('.tl-event');
-      const addrEl  = items[i].querySelector('.tl-addr a');
-      if (timeEl)  timeEl.textContent  = ev.time;
-      if (eventEl) eventEl.textContent = ev.event;
-      if (addrEl)  { addrEl.textContent = ev.address; addrEl.href = ev.mapUrl || '#'; }
-    });
+    const tlContainer = document.querySelector('.tl');
+    if (tlContainer) {
+      tlContainer.innerHTML = s.timeline.map((ev, i) => {
+        const delay = i > 0 ? ` d${i}` : '';
+        const card = `<div class="tl-card">
+          <div class="tl-time">${ev.time}</div>
+          <div class="tl-event">${ev.event}</div>
+          <div class="tl-addr"><a href="${ev.mapUrl || '#'}" target="_blank" rel="noopener">${ev.address}</a></div>
+        </div>`;
+        const dot = `<div class="tl-dot"></div>`;
+        if (i % 2 === 0) {
+          return `<div class="tl-item tl-item--l reveal${delay}">${card}${dot}</div>`;
+        } else {
+          return `<div class="tl-item tl-item--r reveal${delay}">${dot}${card}</div>`;
+        }
+      }).join('');
+      tlContainer.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    }
   }
 
   // Details paragraphs
