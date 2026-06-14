@@ -767,6 +767,7 @@ body::after {
 
   .section { padding: 74px 20px; }
   .rsvp { padding: 28px 18px; }
+  .dc__palette { gap: 10px; }
   .player { width: min(300px, 86vw); }
   .player__btn { width: 56px; height: 56px; }
   .player__btn svg { width: 17px; height: 17px; }
