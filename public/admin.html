@@ -1107,6 +1107,7 @@ function renderTable() {
       </td>
       <td class="actions">
         <button class="copy-btn" onclick="copyLink('${g.slug}', this)">Копіювати</button>
+        ${g.confirmed ? `<button class="edit-btn" onclick="resetConfirmation('${g.slug}')">↺ Скинути</button>` : ''}
         <button class="del-btn" onclick="deleteGuest('${g.slug}')">Видалити</button>
       </td>
     </tr>
@@ -1180,6 +1181,15 @@ function copyLink(slug, btn) {
     btn.textContent = 'Копіювати';
     btn.classList.remove('copied');
   }, 2000);
+}
+
+async function resetConfirmation(slug) {
+  await fetch(`${API}/guest/${slug}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ confirmed: false })
+  });
+  loadGuests();
 }
 
 async function deleteGuest(slug) {

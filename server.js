@@ -160,13 +160,18 @@ app.patch('/api/guest/:slug', (req, res) => {
     return res.status(404).json({ error: 'guest not found' });
   }
 
-  const { phone, name, table } = req.body;
+  const { phone, name, table, confirmed } = req.body;
   if (phone !== undefined) {
     guests[guestIndex].phone = phone;
   }
 
   if (table !== undefined) {
     guests[guestIndex].table = table;
+  }
+
+  if (confirmed === false) {
+    guests[guestIndex].confirmed = false;
+    delete guests[guestIndex].confirmedAt;
   }
 
   if (name !== undefined && name.trim()) {
